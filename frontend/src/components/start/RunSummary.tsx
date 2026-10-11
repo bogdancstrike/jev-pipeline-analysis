@@ -2,7 +2,8 @@ import { ClockCircleOutlined, ClusterOutlined } from "@ant-design/icons";
 import { Tag, Typography } from "antd";
 
 import type { AppConfig } from "../../api/types";
-import { engineGroups, secondsPerArticle } from "../../lib/estimate";
+import { engineGroups, runEstimate } from "../../lib/estimate";
+import { useRuns } from "../../hooks/queries";
 import { duration, num } from "../../lib/format";
 
 const SIZES = [50, 500, 5_000, 30_000];
@@ -10,8 +11,9 @@ const SIZES = [50, 500, 5_000, 30_000];
 /** What the selection will cost before it runs: engines involved and an estimated duration. */
 export function RunSummary({ config, selected }: { config: AppConfig; selected: string[] }) {
   const groups = engineGroups(selected, config.modules);
-  const { perArticle, unknown } = secondsPerArticle(selected, config.modules);
-  const rate = perArticle > 0 ? 1 / perArticle : null;
+  const runs = useRuns();
+  const { perArticle, unknown, source, samples } = runEstimate(selected, config.modules, runs.data ?? []);
+  const rate = perArticle > 0 && !unknown.length ? 1 / perArticle : null;
   return (
     <aside className="run-summary" aria-label="Run summary">
       <div className="run-summary-title">Your run</div>
@@ -40,9 +42,9 @@ export function RunSummary({ config, selected }: { config: AppConfig; selected: 
                 </tbody>
               </table>
             </>
-          ) : <div className="muted small">Only CPU tasks: thousands of articles per second.</div>}
+          ) : <div className="muted small">Estimate unavailable for this configuration.</div>}
           {unknown.length > 0 && <div className="muted small">Not benchmarked yet: {unknown.join(", ")}.</div>}
-          <div className="rs-foot muted small">From single-task benchmarks on this GPU, 300–1,500-word articles.</div>
+          <div className="rs-foot muted small">{source === "history" ? `From ${samples} recent successful run${samples === 1 ? "" : "s"} with these tasks and settings.` : "From single-task benchmarks on this machine."} Document length and GPU load affect actual time.</div>
         </>
       )}
     </aside>

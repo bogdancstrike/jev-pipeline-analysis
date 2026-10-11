@@ -19,6 +19,7 @@ export interface ModuleInfo {
   dependents?: string[];
   shares_engine_with?: string[];
   profile?: ModuleProfile;
+  timing_key?: string;
 }
 
 /** From each module's YAML `profile:` block, filled from docs/BENCHMARKS.md measurements. */
@@ -96,7 +97,7 @@ export interface LabelResult {
   techniques?: string[];   // propaganda
 }
 
-export interface Span { start: number; end: number; text: string; label: string; score: number }
+export interface Span { start: number; end: number; text: string; label: string; score: number; source?: string; validation?: string }
 export interface EntitiesResult { spans: Span[]; groups: Record<string, string[]> }
 
 export interface ResolvedEntity {
@@ -165,6 +166,7 @@ export interface RowQuery {
 export interface Percentiles { p50: number | null; p95: number | null; p99: number | null; mean: number | null }
 
 export interface ModuleMetrics {
+  timing_key?: string;
   rows: number; batches: number; start_s: number | null; end_s: number | null;
   wall_s: number; busy_s: number; parallelism: number | null; rows_per_s: number | null;
   batch_ms: Percentiles; row_ms: Percentiles; engine: string | null; errors: number;

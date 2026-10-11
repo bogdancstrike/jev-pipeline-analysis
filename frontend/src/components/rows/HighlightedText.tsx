@@ -19,7 +19,8 @@ function HighlightedTextInner({ text, spans, resolved, modules }: {
         if (!seg.span) return <Fragment key={i}>{seg.text}</Fragment>;
         const c = entityColor(seg.span.label, modules);
         const ent = owner.get(`${seg.span.start}:${seg.span.end}`);
-        const title = `${seg.span.label} · ${Math.round(seg.span.score * 100)}%${ent ? ` · ${ent.canonical ?? ent.name} (${ent.id})` : ""}`;
+        const confidence = seg.span.source === "pattern" ? `pattern match · ${seg.span.validation?.replace(/_/g, " ") ?? "syntax"}` : `${Math.round(seg.span.score * 100)}%`;
+        const title = `${seg.span.label} · ${confidence}${ent ? ` · ${ent.canonical ?? ent.name} (${ent.id})` : ""}`;
         return (
           <mark key={i} className="ent" style={{ background: `color-mix(in srgb, ${c} 14%, transparent)`, borderColor: c }} title={title}>
             {seg.text}<span className="ent-label" style={{ color: c }}>{seg.span.label}</span>

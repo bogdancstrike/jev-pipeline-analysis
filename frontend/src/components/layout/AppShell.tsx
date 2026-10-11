@@ -1,6 +1,6 @@
 import {
   DashboardOutlined, DesktopOutlined, MenuFoldOutlined, MenuUnfoldOutlined, MoonOutlined, PlusCircleOutlined,
-  SettingOutlined, SunOutlined, UnorderedListOutlined,
+  SettingOutlined, SunOutlined, UnorderedListOutlined, ReadOutlined,
 } from "@ant-design/icons";
 import { Button, Layout, Menu, Progress, Segmented, Tooltip } from "antd";
 import type { ReactNode } from "react";
@@ -11,7 +11,7 @@ import { useStoredState } from "../../hooks/useUrlState";
 import { useTheme, type Appearance } from "../../theme/ThemeProvider";
 import { ServiceStatus } from "./ServiceStatus";
 
-const TITLES: Record<Page, string> = { new: "New analysis", runs: "Runs", dashboard: "Dashboard", admin: "Admin" };
+const TITLES: Record<Page, string> = { new: "New analysis", runs: "Runs", dashboard: "Dashboard", admin: "Admin", docs: "Documentation" };
 
 /** Sidebar navigation + slim top bar; content takes the full width. */
 export function AppShell({ page, title, onNavigate, onOpenJob, children }: {
@@ -36,6 +36,7 @@ export function AppShell({ page, title, onNavigate, onOpenJob, children }: {
                 { key: "runs", icon: <UnorderedListOutlined />, label: "Runs" },
                 { key: "dashboard", icon: <DashboardOutlined />, label: "Dashboard" },
                 { key: "admin", icon: <SettingOutlined />, label: "Admin" },
+                { key: "docs", icon: <ReadOutlined />, label: "Docs" },
               ]} />
         {running.length > 0 && (
           <div className="sider-running">

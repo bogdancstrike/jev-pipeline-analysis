@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 
-export type Page = "new" | "runs" | "dashboard" | "admin";
+export type Page = "new" | "runs" | "dashboard" | "admin" | "docs";
 
-const PATHS: Record<Page, string> = { new: "/", runs: "/runs", dashboard: "/dashboard", admin: "/admin" };
+const PATHS: Record<Page, string> = { new: "/", runs: "/runs", dashboard: "/dashboard", admin: "/admin", docs: "/docs" };
 
 export interface Route { page: Page; jobId: string | null }
 

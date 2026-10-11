@@ -7,6 +7,7 @@ import { ApiError } from "../api/client";
 import { api } from "../api/endpoints";
 import type { AdminModule } from "../api/types";
 import { ErrorAlert } from "../components/common/ErrorAlert";
+import { ModelGuide } from "../components/admin/ModelGuide";
 import { PageHeader } from "../components/ui/PageHeader";
 import { keys } from "../hooks/queries";
 import { ago, humanize, plural } from "../lib/format";
@@ -14,11 +15,11 @@ import { ago, humanize, plural } from "../lib/format";
 type Cfg = Record<string, unknown>;
 interface LabelRow { key: string; description: string; uid: number }
 const NUMERIC = ["review_below", "threshold", "min_confidence", "max_pairs", "max_relations", "batch_size", "concurrency",
-  "min_probability", "same_event_threshold", "max_entity_rows", "top_k"];
+  "min_probability", "same_event_threshold", "max_entity_rows", "top_k", "max_chars", "context_chars", "max_mentions"];
 const TASK_GROUPS = [
-  { title: "Classification & routing", names: ["language", "category", "relevance", "routing"] },
-  { title: "Entities & events", names: ["ner", "entity_resolution", "relations", "fields", "event", "event_coreference"] },
-  { title: "Tone & risk", names: ["sentiment", "intent", "risk", "toxicity", "propaganda"] },
+  { title: "Classification & routing", names: ["language", "category", "genre", "relevance", "routing"] },
+  { title: "Entities & events", names: ["ner", "ioc", "entity_resolution", "relations", "fields", "event", "event_coreference", "temporal"] },
+  { title: "Tone & risk", names: ["sentiment", "emotion", "intent", "risk", "toxicity", "propaganda", "extremism"] },
 ];
 
 function toRows(labels: unknown): LabelRow[] {
@@ -103,6 +104,12 @@ function Editor({ m, onDirtyChange }: { m: AdminModule; onDirtyChange: (dirty: b
       <Select id="task-engine" value={String(draft.engine ?? "")} onChange={(v) => set("engine", v)} options={m.engine_choices.map((e) => ({ value: e, label: e }))} />
       <span className="muted small">Compatible with {m.engine_kinds.join(" / ")}</span></div>}
     {m.requires.length > 0 && <div className="admin-dependencies"><span className="muted small">Requires</span>{m.requires.map((name) => <Tag key={name}>{humanize(name)}</Tag>)}</div>}
+    {m.name === "ner" && <div className="admin-settings"><div className="admin-section-label"><h4>Identifiers & validation</h4><p>Local checks add exact spans without another GPU pass. Valid format does not verify ownership or identity.</p></div>
+      <div className="admin-field"><label htmlFor="pii-labels">Personal identifiers</label><Select id="pii-labels" mode="multiple" value={(draft.pii_labels as string[]) ?? []} options={["email", "phone", "cnp", "personal id", "iban"].map((value) => ({ value, label: value === "cnp" ? "Romanian CNP (validated)" : humanize(value) }))} onChange={(value) => set("pii_labels", value)} /></div>
+      <div className="admin-toggle-grid">{[["include_numbers", "Extract general numbers", "Counts and measurements are labelled Number"], ["exclude_code", "Exclude code from model NER", "Keep code variables out of people and organizations"], ["money_requires_currency", "Validate monetary amounts", "Require nearby explicit currency evidence"]].map(([key, title, hint]) => <div key={key} className="admin-toggle"><div><label htmlFor={key}>{title}</label><p>{hint}</p></div><Switch id={key} checked={draft[key] === true} onChange={(value) => set(key, value)} /></div>)}</div>
+    </div>}
+    {m.name === "temporal" && <div className="admin-field"><label htmlFor="reference-date">Reference date</label><Input id="reference-date" value={String(draft.reference_date ?? "")} placeholder="2026-10-11 · optional" onChange={(e) => set("reference_date", e.target.value)} /><span className="muted small">Overrides the row's publication date. Without either, relative dates stay unresolved. No model fallback.</span></div>}
+    {draft.engine === "laya" && <div className="admin-field-grid">{["max_len", "head_max_len"].map((key) => <div key={key} className="admin-field"><label htmlFor={`engine-${key}`}>{key === "max_len" ? "Context tokens" : "Question tokens"}</label><InputNumber id={`engine-${key}`} min={64} max={4096} step={64} value={Number((draft.engine_options as Cfg | undefined)?.[key] ?? (key === "max_len" ? 2048 : 192))} onChange={(value) => set("engine_options", { ...(draft.engine_options as Cfg ?? {}), [key]: value })} /></div>)}</div>}
     {numericKeys.length > 0 && <><div className="admin-section-label"><h4>Processing controls</h4><p>Adjust confidence thresholds and processing limits.</p></div>
       <div className="admin-field-grid">{numericKeys.map((key) => <div key={key} className="admin-field"><label htmlFor={`setting-${key}`}>{humanize(key)}</label>
         <InputNumber id={`setting-${key}`} style={{ width: "100%" }} value={draft[key] as number} onChange={(v) => set(key, v)} step={/below|threshold|confidence|probability/.test(key) ? 0.05 : 1} />
@@ -168,6 +175,7 @@ export function AdminPage() {
   const [search, setSearch] = useState("");
   const [dirty, setDirty] = useState(false);
   const [expanded, setExpanded] = useState<string[]>([TASK_GROUPS[0].title]);
+  const [guideOpen, setGuideOpen] = useState(false);
   if (q.error) return <ErrorAlert error={q.error} onRetry={() => q.refetch()} />;
   if (!q.data) return <Skeleton active />;
   const current = q.data.find((m) => m.name === selected) ?? q.data[0];
@@ -187,6 +195,7 @@ export function AdminPage() {
   };
   return <div className="admin">
     <PageHeader title="Task configuration" description="Fine-tune models, instructions and output options for your analyses."
+      actions={<Button onClick={() => setGuideOpen(true)}>Model guide</Button>}
       meta={<><span className="meta-chip">{q.data.filter((m) => m.enabled).length} enabled</span><span className="meta-chip">{q.data.filter((m) => m.override).length} customised</span></>} />
     {engines.data?.store === "memory" && <Alert type="warning" showIcon title="Settings are kept in memory" className="admin-store-alert" description="Changes are lost when the backend restarts. Configure a database to retain them." />}
     <div className="admin-layout">
@@ -208,5 +217,6 @@ export function AdminPage() {
       </nav>
       {current ? <Editor key={current.name} m={current} onDirtyChange={setDirty} /> : <Empty description="No tasks configured" />}
     </div>
+    <ModelGuide open={guideOpen} onClose={() => setGuideOpen(false)} />
   </div>;
 }

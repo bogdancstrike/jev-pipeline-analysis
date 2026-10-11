@@ -1,4 +1,5 @@
 import { Result, Skeleton } from "antd";
+import { lazy, Suspense } from "react";
 
 import { ErrorAlert } from "./components/common/ErrorAlert";
 import { JobPage } from "./components/job/JobPage";
@@ -9,6 +10,7 @@ import { useRoute } from "./hooks/useRoute";
 import { AdminPage } from "./pages/AdminPage";
 import { DashboardPage } from "./pages/DashboardPage";
 import { RunsPage } from "./pages/RunsPage";
+const DocsPage = lazy(() => import("./pages/DocsPage"));
 
 /** Pages behind a sidebar: New analysis, Runs (and one run: ?job=...), Dashboard, Admin. */
 export default function App() {
@@ -17,7 +19,9 @@ export default function App() {
   const openJob = (id: string) => go("runs", id);
 
   let body;
-  if (config.error) {
+  if (route.page === "docs") {
+    body = <Suspense fallback={<Skeleton active />}><DocsPage modules={config.data?.modules ?? []} /></Suspense>;
+  } else if (config.error) {
     body = <Result status="warning" title="The backend is not answering"
                    subTitle={<ErrorAlert error={config.error} onRetry={() => config.refetch()} />} />;
   } else if (!config.data) {

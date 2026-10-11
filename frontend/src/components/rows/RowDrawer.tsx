@@ -7,7 +7,7 @@ import { isTerminal, useRow } from "../../hooks/queries";
 import { ErrorAlert } from "../common/ErrorAlert";
 import { LabelTag } from "../results/LabelView";
 import { rendererFor } from "../results/registry";
-import { HighlightedText } from "./HighlightedText";
+import { TextLabels } from "./TextLabels";
 
 interface Props {
   job: JobSnapshot;
@@ -49,17 +49,7 @@ export function RowDrawer({ job, modules, idx, onClose, onOpen, onFilter }: Prop
         <div className="drawer-body">
           {r.review.length > 0 && <Alert type="warning" showIcon title={`Worth a human look: ${r.review.map(title).join(", ")} answered with low confidence.`} />}
           {Object.entries(r.errors).map(([m, msg]) => <Alert key={m} type="error" showIcon title={`${title(m)} failed`} description={msg} />)}
-          <HighlightedText text={r.text} spans={ner?.spans ?? []} resolved={er?.entities ?? []} modules={modules} />
-          {labels.length > 0 && (
-            <div className="label-grid">
-              {labels.map((m) => (
-                <div key={m.name} className="label-card">
-                  <div className="label-card-title">{m.title}</div>
-                  {rendererFor(m.kind).detail(r.results[m.name], ctx(m.name))}
-                </div>
-              ))}
-            </div>
-          )}
+          <TextLabels row={r} labels={labels} modules={modules} spans={ner?.spans ?? []} resolved={er?.entities ?? []} onFilter={onFilter} />
         </div>
       ),
     });
@@ -88,6 +78,9 @@ export function RowDrawer({ job, modules, idx, onClose, onOpen, onFilter }: Prop
     if (job.modules.includes("event_coreference")) {
       tabs.push({ key: "event", label: tabLabel("Same event"),
                   children: <div className="drawer-body">{rendererFor("cluster").detail(r.results["event_coreference"], ctx("event_coreference"))}</div> });
+    }
+    for (const m of inJob.filter((m) => m.kind !== "label" && !["ner", "entity_resolution", "relations", "fields", "event_coreference"].includes(m.name))) {
+      tabs.push({ key: m.name, label: tabLabel(m.title), children: <div className="drawer-body">{rendererFor(m.kind).detail(r.results[m.name], ctx(m.name))}</div> });
     }
   }
   const active = tabs.some((t) => t.key === tab) ? tab : "text";
