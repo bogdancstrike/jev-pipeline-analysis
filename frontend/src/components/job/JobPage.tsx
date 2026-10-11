@@ -11,6 +11,7 @@ import { RowDrawer } from "../rows/RowDrawer";
 import { defaultColumns, RowsView, type RowMode } from "../rows/RowsView";
 import { JobHeader } from "./JobHeader";
 import { Overview, type Filter } from "./Overview";
+import { PerformanceTab } from "./PerformanceTab";
 
 const PAGE_SIZE = 25;
 
@@ -19,7 +20,7 @@ export function JobPage({ jobId, config, onBack }: { jobId: string; config: AppC
   const job = jobQ.data;
   const summaryQ = useSummary(job);
 
-  const [tab, setTab] = useState<"overview" | "rows">("overview");
+  const [tab, setTab] = useState<"overview" | "rows" | "performance">("overview");
   const [filters, setFilters] = useState<Filter[]>([]);
   const [mode, setMode] = useState<RowMode>("all");
   const [search, setSearch] = useState("");
@@ -57,13 +58,17 @@ export function JobPage({ jobId, config, onBack }: { jobId: string; config: AppC
       <JobHeader job={job} modules={modules} onBack={onBack} />
       <Tabs
         activeKey={tab}
-        onChange={(k) => setTab(k as "overview" | "rows")}
+        onChange={(k) => setTab(k as "overview" | "rows" | "performance")}
         items={[
           {
             key: "overview", label: "Overview",
             children: <Overview job={job} summary={summaryQ.data} error={summaryQ.error} modules={modules}
                                 onFilter={addFilter} onReview={() => { setMode("review"); setTab("rows"); }}
                                 onErrors={() => { setMode("errors"); setTab("rows"); }} onOpenRow={setOpenIdx} />,
+          },
+          {
+            key: "performance", label: "Performance",
+            children: tab === "performance" ? <PerformanceTab job={job} modules={modules} /> : null,
           },
           {
             key: "rows",

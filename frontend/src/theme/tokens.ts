@@ -77,3 +77,14 @@ export const FONT = {
 export const RADIUS = { control: 8, card: 12, pill: 999 } as const;
 
 export const LAYOUT = { maxWidth: 1360, headerHeight: 56, gutter: 24, gutterMobile: 16 } as const;
+
+/**
+ * Chart palette: the dataviz reference instance, validated with the skill's checker
+ * (3 slots all-pairs: CVD dE >= 9.2 light / 9.4 dark, normal-vision >= 24 / 20.9).
+ * Slot order is the colour-blind-safety mechanism: assign in order, never cycle.
+ * Light aqua is < 3:1 on the surface, so charts using it carry direct labels + table view.
+ */
+export const CHART: Record<Mode, { series: string[]; good: string; critical: string; grid: string; wash: string }> = {
+  light: { series: ["#2a78d6", "#eb6834", "#1baf7a"], good: "#0ca30c", critical: "#d03b3b", grid: "#e4e7ec", wash: "rgba(42,120,214,0.10)" },
+  dark: { series: ["#3987e5", "#d95926", "#199e70"], good: "#0ca30c", critical: "#d03b3b", grid: "#2c3038", wash: "rgba(57,135,229,0.14)" },
+};

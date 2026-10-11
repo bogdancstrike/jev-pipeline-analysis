@@ -15,6 +15,17 @@ export interface ModuleInfo {
   default_on: boolean;
   labels?: Record<string, string>;
   review_below?: number;
+  records?: Record<string, string[]>;
+  dependents?: string[];
+  shares_engine_with?: string[];
+  profile?: ModuleProfile;
+}
+
+/** From each module's YAML `profile:` block, filled from docs/BENCHMARKS.md measurements. */
+export interface ModuleProfile {
+  speed?: "fast" | "medium" | "slow";
+  throughput?: string;     // e.g. "≈ 95 articles/s alone (RTX 3080, 675-word articles)"
+  notes?: string;
 }
 
 export interface SampleInfo {
@@ -145,4 +156,48 @@ export interface RowQuery {
   review: boolean;
   errors: boolean;
   q: string;
+}
+
+// ------------------------------------------------------------------ metrics & dashboard
+export interface Percentiles { p50: number | null; p95: number | null; p99: number | null; mean: number | null }
+
+export interface ModuleMetrics {
+  rows: number; batches: number; start_s: number | null; end_s: number | null;
+  wall_s: number; busy_s: number; parallelism: number | null; rows_per_s: number | null;
+  batch_ms: Percentiles; row_ms: Percentiles; engine: string | null; errors: number;
+}
+
+export interface EngineMetrics {
+  kind: string; ready: boolean; requests: number; errors: number; retries: number;
+  inflight: number; items: number; latency_ms: Percentiles;
+}
+
+export interface JobMetrics {
+  job: JobSnapshot;
+  wall_s: number;
+  rows_per_s: number | null;
+  peak_rows_per_s: number;
+  modules: Record<string, ModuleMetrics>;
+  timeline: { t: number; done: Record<string, number> }[];
+  engines: Record<string, EngineMetrics>;
+}
+
+export interface RunRecord {
+  id: string; filename: string; status: JobStatus; total: number; modules: string[];
+  created_at: number; wall_s: number | null; rows_per_s: number | null;
+  metrics: { modules: Record<string, ModuleMetrics>; peak_rows_per_s: number; failed_rows: number };
+}
+
+// ------------------------------------------------------------------ admin
+export interface AdminModule {
+  name: string; title: string; description: string; kind: ModuleKind; enabled: boolean;
+  requires: string[]; engine_kinds: string[]; engine_choices: string[];
+  defaults: Record<string, unknown>; override: Record<string, unknown> | null;
+  effective: Record<string, unknown>;
+}
+
+export interface HistoryEntry {
+  id: number; module: string; action: "update" | "reset";
+  before: Record<string, unknown> | null; after: Record<string, unknown> | null;
+  changed_at: number; changed_by: string;
 }

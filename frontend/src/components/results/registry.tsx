@@ -39,7 +39,7 @@ export const RENDERERS: Record<ModuleKind, Renderer> = {
   },
   relations: {
     cell: (v) => <RelationsCell value={v} />,
-    detail: (v) => <RelationsDetail value={v} />,
+    detail: (v, c) => <RelationsDetail value={v} modules={c.modules} />,
   },
   cluster: {
     cell: (v) => <ClusterCell value={v} />,

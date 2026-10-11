@@ -1,17 +1,20 @@
 import { Result, Skeleton } from "antd";
 
-import { AppHeader } from "./components/layout/AppHeader";
 import { ErrorAlert } from "./components/common/ErrorAlert";
 import { JobPage } from "./components/job/JobPage";
+import { AppShell } from "./components/layout/AppShell";
 import { NewRun } from "./components/start/NewRun";
-import { RecentRuns } from "./components/start/RecentRuns";
 import { useAppConfig } from "./hooks/queries";
-import { useUrlParam } from "./hooks/useUrlState";
+import { useRoute } from "./hooks/useRoute";
+import { AdminPage } from "./pages/AdminPage";
+import { DashboardPage } from "./pages/DashboardPage";
+import { RunsPage } from "./pages/RunsPage";
 
-/** Two screens: start a run, or look at one. The run id lives in the URL (?job=…). */
+/** Pages behind a sidebar: New analysis, Runs (and one run: ?job=...), Dashboard, Admin. */
 export default function App() {
   const config = useAppConfig();
-  const [jobId, setJobId] = useUrlParam("job");
+  const [route, go] = useRoute();
+  const openJob = (id: string) => go("runs", id);
 
   let body;
   if (config.error) {
@@ -19,22 +22,25 @@ export default function App() {
                    subTitle={<ErrorAlert error={config.error} onRetry={() => config.refetch()} />} />;
   } else if (!config.data) {
     body = <Skeleton active paragraph={{ rows: 8 }} />;
-  } else if (jobId) {
-    body = <JobPage jobId={jobId} config={config.data} onBack={() => setJobId(null)} />;
+  } else if (route.jobId) {
+    body = <JobPage jobId={route.jobId} config={config.data} onBack={() => go("runs")} />;
+  } else if (route.page === "runs") {
+    body = <RunsPage onOpen={openJob} />;
+  } else if (route.page === "dashboard") {
+    body = <DashboardPage />;
+  } else if (route.page === "admin") {
+    body = <AdminPage />;
   } else {
-    body = (
-      <div className="start-page">
-        <NewRun config={config.data} onStarted={(j) => setJobId(j.id)} />
-        <RecentRuns onOpen={setJobId} />
-      </div>
-    );
+    body = <NewRun config={config.data} onStarted={(j) => openJob(j.id)} />;
   }
 
   return (
-    <div className="app">
+    <>
       <a className="skip-link" href="#main">Skip to content</a>
-      <AppHeader onHome={() => setJobId(null)} />
-      <main id="main" className="app-main">{body}</main>
-    </div>
+      <AppShell page={route.jobId ? "runs" : route.page} title={route.jobId ? "Run" : undefined}
+                onNavigate={(p) => go(p)} onOpenJob={openJob}>
+        {body}
+      </AppShell>
+    </>
   );
 }

@@ -1,6 +1,6 @@
 import { theme as antdTheme, type ThemeConfig } from "antd";
 
-import { ACCENT, FONT, INK, NEUTRAL, RADIUS, SEMANTIC, SEMANTIC_TEXT, type Mode } from "./tokens";
+import { ACCENT, CHART, FONT, INK, NEUTRAL, RADIUS, SEMANTIC, SEMANTIC_TEXT, type Mode } from "./tokens";
 
 /** The antd theme, derived from tokens only: re-theming is one edit in tokens.ts. */
 export function buildTheme(mode: Mode): ThemeConfig {
@@ -68,5 +68,12 @@ export function cssVariables(mode: Mode): Record<string, string> {
     "--mono": FONT.mono,
     "--radius": `${RADIUS.control}px`,
     "--radius-lg": `${RADIUS.card}px`,
+    "--series-1": CHART[mode].series[0],
+    "--series-2": CHART[mode].series[1],
+    "--series-3": CHART[mode].series[2],
+    "--good": CHART[mode].good,
+    "--critical": CHART[mode].critical,
+    "--grid": CHART[mode].grid,
+    "--wash": CHART[mode].wash,
   };
 }

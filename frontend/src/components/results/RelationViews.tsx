@@ -1,7 +1,8 @@
 import { ArrowRightOutlined } from "@ant-design/icons";
 import { Tooltip, Typography } from "antd";
 
-import type { ClusterResult, Relation } from "../../api/types";
+import type { ClusterResult, ModuleInfo, Relation } from "../../api/types";
+import { RelationGraph } from "./RelationGraph";
 import { humanize, pct } from "../../lib/format";
 
 function Triple({ r }: { r: Pick<Relation, "head" | "relation" | "tail"> }) {
@@ -24,11 +25,12 @@ export function RelationsCell({ value }: { value: unknown }) {
   );
 }
 
-export function RelationsDetail({ value }: { value: unknown }) {
+export function RelationsDetail({ value, modules }: { value: unknown; modules: ModuleInfo[] }) {
   const rels = ((value as { relations?: Relation[] } | null)?.relations) ?? [];
   if (!rels.length) return <span className="muted">No relation stated between the entities in this text.</span>;
   return (
     <div className="relation-list">
+      <RelationGraph relations={rels} modules={modules} />
       {rels.map((r, i) => (
         <div key={i} className="relation-row">
           <Triple r={r} />

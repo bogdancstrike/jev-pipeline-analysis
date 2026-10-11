@@ -12,6 +12,11 @@ export const keys = {
   summary: (id: string) => ["job", id, "summary"] as const,
   rows: (id: string) => ["job", id, "rows"] as const,
   row: (id: string, idx: number) => ["job", id, "row", idx] as const,
+  metrics: (id: string) => ["job", id, "metrics"] as const,
+  runs: ["runs"] as const,
+  engineMetrics: ["engine-metrics"] as const,
+  admin: ["admin", "modules"] as const,
+  history: (m?: string) => ["admin", "history", m ?? "*"] as const,
 };
 
 export const isTerminal = (s?: JobSnapshot | null) => !!s && TERMINAL.includes(s.status);
@@ -81,7 +86,8 @@ export function useSummary(job: JobSnapshot | undefined) {
     queryKey: keys.summary(job?.id ?? ""),
     queryFn: ({ signal }) => api.summary(job!.id, signal),
     enabled: !!job,
-    refetchInterval: job && !isTerminal(job) ? 2_000 : false,
+    // Summaries walk every row: poll gently on big jobs.
+    refetchInterval: job && !isTerminal(job) ? (job.total > 5_000 ? 5_000 : 2_000) : false,
     placeholderData: keepPreviousData,
   });
 }
@@ -104,4 +110,24 @@ export function useRow(jobId: string, idx: number | null, live: boolean) {
     enabled: idx !== null,
     refetchInterval: live ? 3_000 : false,
   });
+}
+
+/** Timings for the job's performance view: 1 s while running, final once stopped. */
+export function useJobMetrics(job: JobSnapshot | undefined) {
+  return useQuery({
+    queryKey: [...keys.metrics(job?.id ?? ""), job?.status],
+    queryFn: ({ signal }) => api.metrics(job!.id, signal),
+    enabled: !!job,
+    refetchInterval: job && !isTerminal(job) ? 1_000 : false,
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useRuns() {
+  return useQuery({ queryKey: keys.runs, queryFn: ({ signal }) => api.runs(signal), refetchInterval: 10_000 });
+}
+
+export function useEngineMetrics() {
+  return useQuery({ queryKey: keys.engineMetrics, queryFn: ({ signal }) => api.engineMetrics(signal),
+                    refetchInterval: 2_000 });
 }

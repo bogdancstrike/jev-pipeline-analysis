@@ -1,5 +1,5 @@
 import { ArrowLeftOutlined, DownloadOutlined, StopOutlined } from "@ant-design/icons";
-import { Alert, App, Button, Popover, Progress, Space, Tooltip } from "antd";
+import { Alert, App, Button, Progress, Space, Tooltip } from "antd";
 import { useQueryClient } from "@tanstack/react-query";
 
 import { api } from "../../api/endpoints";
@@ -45,7 +45,7 @@ export function JobHeader({ job, modules, onBack }: { job: JobSnapshot; modules:
       <div className="job-header-top">
         <div className="job-title-block">
           <Button type="text" size="small" icon={<ArrowLeftOutlined />} onClick={onBack} className="back-btn">
-            New run
+            All runs
           </Button>
           <div className="job-title-row">
             <h1 className="page-title" title={job.filename}>{job.filename}</h1>
@@ -69,11 +69,15 @@ export function JobHeader({ job, modules, onBack }: { job: JobSnapshot; modules:
         </Space>
       </div>
       {!terminal && (
-        <Popover content={<ModuleProgress job={job} modules={modules} />} placement="bottomLeft" title="Per analysis">
-          <div className="overall-progress" tabIndex={0} aria-label="Progress details">
-            <Progress percent={Math.floor(job.percent)} status="active" />
+        <div className="live" aria-live="polite">
+          <div className="live-counter">
+            <span className="live-num">{num(job.done)}</span>
+            <span className="live-of">/ {num(job.total)} records processed</span>
+            <span className="live-rate">{job.rows_per_s} records/s</span>
           </div>
-        </Popover>
+          <Progress percent={Math.floor(job.percent)} status="active" showInfo={false} />
+          <ModuleProgress job={job} modules={modules} />
+        </div>
       )}
       {job.status === "failed" && <Alert type="error" showIcon title="The run stopped" description={job.error} />}
     </div>
