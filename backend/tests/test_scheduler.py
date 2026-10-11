@@ -161,3 +161,41 @@ async def test_tasks_sharing_an_engine_stay_row_aligned():
     assert job.status == JobStatus.DONE
     window = fast.batch_size * fast.concurrency * 2
     assert FastOnEngine.max_lead <= window + fast.batch_size, FastOnEngine.max_lead
+
+
+@pytest.mark.asyncio
+async def test_delete_waits_for_terminal_history_save():
+    """Deletion cannot race an on_finish callback that is already saving a done job."""
+    jm = JobManager(make_settings())
+    saving, release = asyncio.Event(), asyncio.Event()
+    saved = []
+
+    async def persist(job):
+        saving.set()
+        await release.wait()
+        saved.append(job.id)
+
+    jm.on_finish = persist
+    job = jm.submit("t.csv", pd.DataFrame({"id": ["1"], "text": ["x"]}), registry(Upper).closure(["upper"]))
+    await asyncio.wait_for(saving.wait(), 2)
+    assert job.status == JobStatus.DONE
+    deletion = asyncio.create_task(jm.delete(job))
+    await asyncio.sleep(0)
+    assert not deletion.done()
+    release.set()
+    await asyncio.wait_for(deletion, 2)
+    assert saved == [job.id]
+    assert jm.get(job.id) is None
+
+
+@pytest.mark.asyncio
+async def test_delete_queued_job_leaves_running_job_alone():
+    jm = JobManager(make_settings(max_parallel_jobs=1))
+    modules = registry(Slow).closure(["slow"])
+    frame = pd.DataFrame({"id": ["1"], "text": ["x"]})
+    first, queued = jm.submit("first.csv", frame, modules), jm.submit("queued.csv", frame, modules)
+    await asyncio.sleep(0)
+    assert first.status == JobStatus.RUNNING and queued.status == JobStatus.QUEUED
+    await jm.delete(queued)
+    assert jm.get(queued.id) is None and first.status == JobStatus.RUNNING
+    await jm.aclose()

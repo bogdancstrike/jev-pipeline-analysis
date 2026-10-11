@@ -1,4 +1,4 @@
-import { CodeOutlined, DeleteOutlined, HistoryOutlined, PlusOutlined, SaveOutlined, SearchOutlined, SettingOutlined, TagsOutlined, UndoOutlined } from "@ant-design/icons";
+import { CheckOutlined, CodeOutlined, DeleteOutlined, DownOutlined, HistoryOutlined, PlusOutlined, SaveOutlined, SearchOutlined, SettingOutlined, TagsOutlined, UndoOutlined } from "@ant-design/icons";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Alert, App, Button, Empty, Input, InputNumber, Popconfirm, Select, Skeleton, Switch, Table, Tabs, Tag, Timeline } from "antd";
 import { useEffect, useMemo, useState } from "react";
@@ -15,10 +15,15 @@ type Cfg = Record<string, unknown>;
 interface LabelRow { key: string; description: string; uid: number }
 const NUMERIC = ["review_below", "threshold", "min_confidence", "max_pairs", "max_relations", "batch_size", "concurrency",
   "min_probability", "same_event_threshold", "max_entity_rows", "top_k"];
+const TASK_GROUPS = [
+  { title: "Classification & routing", names: ["language", "category", "relevance", "routing"] },
+  { title: "Entities & events", names: ["ner", "entity_resolution", "relations", "fields", "event", "event_coreference"] },
+  { title: "Tone & risk", names: ["sentiment", "intent", "risk", "toxicity", "propaganda"] },
+];
 
 function toRows(labels: unknown): LabelRow[] {
   if (Array.isArray(labels)) return labels.map((k, uid) => ({ key: String(k), description: "", uid }));
-  return Object.entries((labels as Record<string, string>) ?? {}).map(([key, description], uid) => ({ key, description: description ?? "", uid }));
+  return Object.entries((labels as Record<string, string>) ?? {}).map(([key, description], uid) => ({ key, description: String(description ?? ""), uid }));
 }
 function fromRows(rows: LabelRow[], wasList: boolean): unknown {
   const clean = rows.filter((r) => r.key.trim());
@@ -100,7 +105,7 @@ function Editor({ m, onDirtyChange }: { m: AdminModule; onDirtyChange: (dirty: b
     {m.requires.length > 0 && <div className="admin-dependencies"><span className="muted small">Requires</span>{m.requires.map((name) => <Tag key={name}>{humanize(name)}</Tag>)}</div>}
     {numericKeys.length > 0 && <><div className="admin-section-label"><h4>Processing controls</h4><p>Adjust confidence thresholds and processing limits.</p></div>
       <div className="admin-field-grid">{numericKeys.map((key) => <div key={key} className="admin-field"><label htmlFor={`setting-${key}`}>{humanize(key)}</label>
-        <InputNumber id={`setting-${key}`} value={draft[key] as number} onChange={(v) => set(key, v)} step={/below|threshold|confidence|probability/.test(key) ? 0.05 : 1} />
+        <InputNumber id={`setting-${key}`} style={{ width: "100%" }} value={draft[key] as number} onChange={(v) => set(key, v)} step={/below|threshold|confidence|probability/.test(key) ? 0.05 : 1} />
       </div>)}</div></>}
     {typeof baseline.instructions === "string" && <div className="admin-field admin-instructions"><label htmlFor="task-instructions">Model instructions</label><span className="muted small">The question this task asks the model. Be specific about the expected result.</span>
       <Input.TextArea id="task-instructions" value={String(draft.instructions ?? "")} onChange={(e) => set("instructions", e.target.value)} autoSize={{ minRows: 3, maxRows: 8 }} /></div>}
@@ -162,13 +167,21 @@ export function AdminPage() {
   const [selected, setSelected] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [dirty, setDirty] = useState(false);
+  const [expanded, setExpanded] = useState<string[]>([TASK_GROUPS[0].title]);
   if (q.error) return <ErrorAlert error={q.error} onRetry={() => q.refetch()} />;
   if (!q.data) return <Skeleton active />;
   const current = q.data.find((m) => m.name === selected) ?? q.data[0];
   const filtered = q.data.filter((m) => `${m.title} ${m.name}`.toLowerCase().includes(search.toLowerCase().trim()));
+  const known = new Set(TASK_GROUPS.flatMap((group) => group.names));
+  const groups = [...TASK_GROUPS.map((group) => ({ title: group.title, items: filtered.filter((m) => group.names.includes(m.name)) })),
+    { title: "Other tasks", items: filtered.filter((m) => !known.has(m.name)) }].filter((group) => group.items.length);
   const select = (name: string) => {
     if (name === current?.name) return;
-    const change = () => { setDirty(false); setSelected(name); };
+    const change = () => {
+      setDirty(false); setSelected(name);
+      const group = groups.find((group) => group.items.some((m) => m.name === name));
+      if (group) setExpanded((old) => old.includes(group.title) ? old : [...old, group.title]);
+    };
     if (dirty) modal.confirm({ title: "Discard unsaved changes?", content: "Your edits to this task have not been saved.", okText: "Discard changes", okButtonProps: { danger: true }, cancelText: "Keep editing", onOk: change });
     else change();
   };
@@ -180,10 +193,17 @@ export function AdminPage() {
       <nav className="admin-list" aria-label="Tasks">
         <div className="admin-list-head"><div><strong>Analysis tasks</strong><span className="muted small">{q.data.length}</span></div>
           <Input prefix={<SearchOutlined />} placeholder="Find a task…" aria-label="Search tasks" value={search} onChange={(e) => setSearch(e.target.value)} allowClear /></div>
-        <div className="admin-list-items">{filtered.length ? filtered.map((m) => <button key={m.name} type="button" aria-current={m.name === current?.name ? "true" : undefined} className={`admin-item${m.name === current?.name ? " is-active" : ""}`} onClick={() => select(m.name)}>
-          <span className="admin-item-main"><strong>{m.title}</strong><span>{m.effective.engine ? String(m.effective.engine) : humanize(m.kind)}</span></span>
-          <span className="admin-item-meta">{!m.enabled ? <span className="admin-off">Off</span> : m.override ? <span className="dot draft-pending" title="Customised" /> : null}</span>
-        </button>) : <p className="admin-no-match muted small">No tasks match “{search}”.</p>}</div>
+        <div className="admin-list-items">{filtered.length ? groups.map((group, index) => {
+          const open = !!search.trim() || expanded.includes(group.title);
+          return <div key={group.title} className={`admin-task-group${open ? " is-open" : ""}`}>
+            <button type="button" className="admin-group-toggle" aria-expanded={open} aria-controls={`task-group-${index}`} onClick={() => setExpanded((old) => old.includes(group.title) ? old.filter((title) => title !== group.title) : [...old, group.title])}>
+              <span>{group.title}</span><span className="admin-group-count">{group.items.length}</span><DownOutlined className="admin-group-arrow" aria-hidden />
+            </button>
+            {open && <div id={`task-group-${index}`} className="admin-group-items">{group.items.map((m) => <button key={m.name} type="button" aria-current={m.name === current?.name ? "true" : undefined} className={`admin-item${m.name === current?.name ? " is-active" : ""}`} onClick={() => select(m.name)}>
+          <span className="admin-item-main"><strong>{m.title}</strong><span className="admin-engine-label">{m.effective.engine ? String(m.effective.engine) : "Local"}</span></span>
+          <span className="admin-item-meta">{!m.enabled ? <span className="admin-off">Off</span> : m.override ? <span className="dot draft-pending" title="Customised" /> : m.name === current?.name ? <CheckOutlined /> : null}</span>
+        </button>)}</div>}</div>;
+        }) : <p className="admin-no-match muted small">No tasks match “{search}”.</p>}</div>
         <div className="admin-list-foot">{plural(filtered.length, "task")} · select one to configure</div>
       </nav>
       {current ? <Editor key={current.name} m={current} onDirtyChange={setDirty} /> : <Empty description="No tasks configured" />}

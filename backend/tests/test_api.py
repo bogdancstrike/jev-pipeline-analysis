@@ -144,3 +144,54 @@ async def test_job_from_pasted_text(api):
     r = await api.post("/api/jobs/text", json={"texts": ["NATO ministers met in Brussels on Thursday."],
                                                "modules": ["language", "ner"]})
     assert r.status_code == 202 and r.json()["total"] == 1 and r.json()["filename"] == "pasted text"
+
+
+@pytest.mark.asyncio
+async def test_bulk_delete_removes_live_and_history_only_runs(api):
+    first = await run_sample(api, "language")
+    second = await run_sample(api, "language")
+    kept = await run_sample(api, "language")
+    platform = api._transport.app.state.platform
+    # Simulate a restart/TTL expiry: the saved record remains, results are no longer in memory.
+    await platform.jobs.delete(platform.jobs.get(second["id"]))
+    assert {r["id"] for r in (await api.get("/api/runs")).json()} == {first["id"], second["id"], kept["id"]}
+    response = await api.post("/api/runs/delete", json={"ids": [first["id"], second["id"], first["id"], "missing"]})
+    assert response.status_code == 204, response.text
+    assert [r["id"] for r in (await api.get("/api/runs")).json()] == [kept["id"]]
+    assert [r["id"] for r in (await api.get("/api/jobs")).json()] == [kept["id"]]
+    assert (await api.get(f"/api/jobs/{first['id']}")).status_code == 404
+    # Retries are harmless, including records that have already disappeared.
+    assert (await api.post("/api/runs/delete", json={"ids": [first["id"], second["id"]]})).status_code == 204
+
+
+@pytest.mark.asyncio
+async def test_single_delete_removes_saved_history_too(api):
+    job = await run_sample(api, "language")
+    assert (await api.delete(f"/api/jobs/{job['id']}")).status_code == 204
+    assert (await api.get("/api/runs")).json() == []
+    assert (await api.get("/api/jobs")).json() == []
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("ids", [[], ["run"] * 1001, [None]])
+async def test_bulk_delete_validates_request(api, ids):
+    assert (await api.post("/api/runs/delete", json={"ids": ids})).status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_delete_active_run_does_not_recreate_history(api, monkeypatch):
+    platform = api._transport.app.state.platform
+    entered = asyncio.Event()
+
+    async def slow_process(job, idxs):
+        entered.set()
+        await asyncio.Event().wait()
+
+    monkeypatch.setattr(platform.registry.get("language"), "process_rows", slow_process)
+    response = await api.post("/api/jobs/text", json={"texts": ["A document to process."], "modules": ["language"]})
+    job = response.json()
+    await asyncio.wait_for(entered.wait(), 2)
+    assert (await api.post("/api/runs/delete", json={"ids": [job["id"]]})).status_code == 204
+    assert job["id"] not in platform.jobs._tasks
+    assert (await api.get("/api/runs")).json() == []
+    assert (await api.get("/api/jobs")).json() == []

@@ -1,9 +1,11 @@
 import { ArrowRightOutlined, DashboardOutlined, FileDoneOutlined, HistoryOutlined, PlusOutlined, ClockCircleOutlined } from "@ant-design/icons";
-import { Button, Empty, Progress, Skeleton, Table, Tag } from "antd";
+import { Button, Empty, Progress, Select, Skeleton, Table, Tag } from "antd";
+import { useState } from "react";
 
 import type { JobSnapshot, RunRecord } from "../api/types";
 import { ChartCard } from "../components/charts/ChartCard";
 import { LineChart, useStableMax } from "../components/charts/LineChart";
+import { activityDays, RunActivity } from "../components/charts/RunActivity";
 import { ErrorAlert } from "../components/common/ErrorAlert";
 import { PageHeader } from "../components/ui/PageHeader";
 import { StatRow, StatTile } from "../components/ui/StatTile";
@@ -51,7 +53,9 @@ export function DashboardPage() {
   const jobs = useJobs();
   const engines = useEngineMetrics();
   const config = useAppConfig();
-  const done = (runs.data ?? []).filter((r) => r.status === "done");
+  const [period, setPeriod] = useState(0);
+  const history = (runs.data ?? []).filter((r) => !period || r.created_at >= Date.now() / 1000 - period * 86400);
+  const done = history.filter((r) => r.status === "done");
   const active = (jobs.data ?? []).filter((j) => j.status === "running");
   const queued = (jobs.data ?? []).filter((j) => j.status === "queued");
   const title = (n: string) => config.data?.modules.find((m) => m.name === n)?.title ?? n;
@@ -69,10 +73,14 @@ export function DashboardPage() {
   })).sort((a, b) => b.mean - a.mean);
   const hasRuns = runs.data !== undefined;
   const stat = (value: string) => hasRuns ? value : "–";
+  const trend = [...done.slice(0, 20)].reverse();
+  const days = activityDays(history);
+  const failed = history.filter((r) => r.status === "failed").length;
+  const cancelled = history.filter((r) => r.status === "cancelled").length;
 
   return <div className="dashboard">
     <PageHeader title="Dashboard" description="Your analysis activity, processing performance and model health."
-      actions={<><Button href="/runs">View runs</Button><Button type="primary" icon={<PlusOutlined />} href="/">New analysis</Button></>} />
+      actions={<><Select aria-label="Statistics period" value={period} onChange={setPeriod} style={{ width: 150 }} options={[{ value: 0, label: "All saved runs" }, { value: 7, label: "Last 7 days" }, { value: 30, label: "Last 30 days" }]} /><Button href="/runs">View runs</Button><Button type="primary" icon={<PlusOutlined />} href="/">New analysis</Button></>} />
     {runs.error ? <ErrorAlert error={runs.error} onRetry={() => runs.refetch()} /> : null}
     {jobs.error ? <ErrorAlert error={jobs.error} onRetry={() => jobs.refetch()} /> : null}
     <StatRow>
@@ -90,6 +98,23 @@ export function DashboardPage() {
       {active[0] && <LiveJob key={active[0].id} job={active[0]} />}
       {active.length > 1 && <div className="dashboard-other-jobs">{active.slice(1).map((job) => <a key={job.id} href={`/runs?job=${job.id}`}>{job.filename}<span>{job.percent.toFixed(0)}% <ArrowRightOutlined /></span></a>)}</div>}
     </section>
+    <div className="dashboard-chart-grid">
+      <ChartCard title="Throughput trend" extra={<span className="muted small">Latest 20 completed runs</span>}
+        chart={runs.isLoading ? <Skeleton active paragraph={{ rows: 3 }} /> : trend.length ? <>
+          <div className="dashboard-chart-summary"><strong>{(totalTime ? totalRecords / totalTime : 0).toFixed(1)}<span> records/s</span></strong><span className="muted small">Overall average · points show individual runs</span></div>
+          <LineChart points={trend.map((run, index) => ({ x: index + 1, y: run.rows_per_s ?? 0 }))} height={130} ariaLabel="Throughput in records per second across recent completed runs" xLabel="run" xMax={Math.max(2, trend.length)} xFormat={(value) => value ? `#${value}` : ""} format={(value) => num(Math.round(value * 10) / 10)} />
+          <div className="dashboard-chart-caption"><span>Older runs</span><span>Most recent</span></div>
+        </> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Throughput trends appear after your first completed run." />}
+        rows={trend.map((run, index) => ({ id: run.id, sequence: index + 1, filename: run.filename, rate: run.rows_per_s ?? 0, time: duration(run.wall_s) }))} rowKey="id"
+        columns={[{ title: "#", dataIndex: "sequence" }, { title: "Run", dataIndex: "filename" }, { title: "Records/s", dataIndex: "rate", align: "right" }, { title: "Time", dataIndex: "time", align: "right" }]} />
+      <ChartCard title="Records processed" extra={<span className="muted small">Last 7 calendar days</span>}
+        chart={runs.isLoading ? <Skeleton active paragraph={{ rows: 3 }} /> : <>
+          <div className="dashboard-chart-summary"><strong>{num(days.reduce((sum, day) => sum + day.records, 0))}<span> records</span></strong><span className="muted small">{plural(days.reduce((sum, day) => sum + day.runs, 0), "completed run")}</span></div>
+          <RunActivity days={days} />
+          <div className="dashboard-chart-caption"><span><span className="dot" style={{ background: "var(--series-3)" }} /> Daily completed records</span><span>{failed} failed · {cancelled} cancelled{period ? ` · last ${period}d` : " · saved history"}</span></div>
+        </>}
+        rows={days} rowKey="key" columns={[{ title: "Date", dataIndex: "label" }, { title: "Runs", dataIndex: "runs", align: "right" }, { title: "Records", dataIndex: "records", align: "right" }]} />
+    </div>
     <div className="dashboard-columns">
       <div className="dashboard-stack">
         <ChartCard title="Recent run performance" extra={<span className="muted small">Latest 15 · records/s</span>}
@@ -106,7 +131,7 @@ export function DashboardPage() {
               { title: "Best /s", dataIndex: "best", align: "right" },
             ]} />
         </section>
-        <p className="dashboard-scope">Run statistics use the latest 200 saved runs. Deleted runs are excluded.</p>
+        <p className="dashboard-scope">{period ? `Showing the last ${period} days within the latest 200 saved runs.` : "Run statistics use the latest 200 saved runs."} Deleted runs are excluded.</p>
       </div>
       <section className="dashboard-panel dashboard-engine-panel">
         <div className="dashboard-panel-head"><div><h3>Model engines</h3><p>Live health and request performance</p></div><Tag color={ready === engineRows.length && ready > 0 ? "success" : "default"}>{ready}/{engineRows.length} ready</Tag></div>

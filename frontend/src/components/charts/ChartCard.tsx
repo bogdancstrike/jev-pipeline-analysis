@@ -9,13 +9,13 @@ export function ChartCard<T extends object>({ title, extra, chart, rows, columns
 }) {
   const [view, setView] = useState<"chart" | "table">("chart");
   return (
-    <Card size="small" className="module-card" title={title} extra={
-      <span className="chart-card-extra">
+    <Card size="small" className="module-card" title={<div className="chart-card-heading">
+      <h3>{title}</h3><span className="chart-card-extra">
         {extra}
         <Segmented size="small" value={view} onChange={(v) => setView(v as "chart" | "table")} aria-label="View"
                    options={[{ value: "chart", icon: <LineChartOutlined />, title: "Chart" },
                              { value: "table", icon: <TableOutlined />, title: "Table" }]} />
-      </span>}>
+      </span></div>} styles={{ title: { whiteSpace: "normal" } }}>
       {view === "chart" ? chart : (
         <Table<T> size="small" rowKey={rowKey} dataSource={rows} pagination={rows.length > 10 ? { pageSize: 10 } : false}
                   columns={columns.map((c) => ({ ...c, key: c.dataIndex }))} scroll={{ x: "max-content" }} />

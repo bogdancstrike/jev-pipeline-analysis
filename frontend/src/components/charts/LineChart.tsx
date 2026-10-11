@@ -77,6 +77,7 @@ function LineChartInner({ points, height = 200, xLabel, format = (v) => v.toLoca
         <path d={area} fill={color} opacity={0.1} className="chart-anim" />
         <path className="chart-anim" d={path} fill="none" stroke={color} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round"
               vectorEffect="non-scaling-stroke" />
+        {points.length === 1 && <circle cx={xs(points[0].x)} cy={ys(points[0].y)} r={4} fill={color} />}
         {hp && (
           <g>
             <line x1={xs(hp.x)} x2={xs(hp.x)} y1={T} y2={H - B} stroke="var(--text-3)" strokeWidth={1} vectorEffect="non-scaling-stroke" />
