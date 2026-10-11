@@ -72,7 +72,7 @@ export function NewRun({ config, onStarted }: { config: AppConfig; onStarted: (j
   return (
     <div className="newrun">
       <PageHeader title="New analysis"
-        description="Pick the analyses, then give it text: a built-in sample, a CSV, or articles pasted in. Everything runs on this server's GPU; no text leaves the machine." />
+        description="Choose analyses for a sample dataset, a CSV, or pasted documents. Models run on your infrastructure." />
       <div className="newrun-grid">
         <div className="newrun-main">
           <Section step={1} title="Choose analyses" description={`${selected.length} of ${config.modules.length} selected. Hover ⓘ for what each one outputs and costs.`}

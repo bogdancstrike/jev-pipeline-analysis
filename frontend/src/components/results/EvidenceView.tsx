@@ -37,6 +37,7 @@ export function EvidenceView({ text, children }: { text: string; children: React
     const container = source.current;
     const mark = container?.querySelector("mark");
     if (container && mark) container.scrollTo({ top: mark.offsetTop - 45, behavior: "smooth" });
+    if (selection) container?.closest(".source-panel")?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, [selection]);
   const parts: ReactNode[] = [];
   let end = 0;
