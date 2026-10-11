@@ -1,0 +1,30 @@
+# Named-entity recognition (GLiNER2.5 on the GPU, zero-shot, character spans).
+enabled: true
+engine: gliner                # named entities -> GLiNER2.5
+engine_options: {model: extract-multi}   # general multilingual extraction checkpoint
+# These strings ARE the prompt. Natural-language labels work better than codes.
+# Overlapping semantics (organization vs institution vs company) compete per span;
+# tune by renaming, not by adding near-duplicates.
+labels:
+  - person
+  - organization
+  - institution
+  - government agency
+  - political party
+  - company
+  - media outlet
+  - military unit
+  - country
+  - city
+  - location
+  - facility
+  - event
+  - date
+  - money
+  - product
+  - law or regulation
+  - weapon
+  - vehicle
+  - nationality
+batch_size: 16      # rows per module batch (the engine batches inside the service)
+concurrency: 2

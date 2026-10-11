@@ -1,0 +1,41 @@
+# --- Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+*.egg-info/
+
+# --- Node / frontend
+node_modules/
+frontend/dist/
+*.tsbuildinfo
+.vite/
+
+# --- Generated sample data: deterministic, rebuild with `python3 scripts/generate_sample.py`.
+# The 50 / 500 rows files are small and stay in git, so the UI works right after clone.
+samples/sample.csv
+samples/sample-5000.csv
+samples/sample-15000.csv
+samples/sample-30000.csv
+
+# --- Benchmark artefacts (raw runs; the summary lives in docs/BENCHMARKS.md)
+benchmarks/runs/
+
+# --- Secrets and local config (secrets are generated at runtime into a Docker volume)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --- Editors / OS / tooling
+.idea/
+.vscode/
+*.swp
+.DS_Store
+test-results/
+playwright-report/
+*.log

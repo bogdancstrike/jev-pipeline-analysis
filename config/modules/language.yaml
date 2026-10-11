@@ -1,0 +1,18 @@
+# Language identification (local, CPU; py3langid). No GPU, no LLM.
+enabled: true
+# Candidate set: restricting it makes short-text detection far more accurate.
+# key = ISO 639-1 code (what the CSV gets), value = display name.
+languages:
+  ro: Romanian
+  en: English
+  ru: Russian
+  uk: Ukrainian
+  hu: Hungarian
+  bg: Bulgarian
+  fr: French
+  de: German
+  es: Spanish
+  it: Italian
+  pl: Polish
+  sr: Serbian
+review_below: 0.8

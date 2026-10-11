@@ -1,0 +1,29 @@
+# Entity resolution (deterministic, CPU). Needs: ner.
+enabled: true
+# Only mentions in the same group can be the same entity. NER labels not listed here
+# (dates, money, nationality, ...) are not resolved.
+groups:
+  person: [person]
+  organization: [organization, institution, government agency, political party, company, media outlet, military unit]
+  place: [country, city, location, facility]
+  event: [event]
+  law: [law or regulation]
+  product: [product, weapon, vehicle]
+# Known aliases (first entry = canonical form). Matching is case- and diacritics-insensitive.
+aliases:
+  - [European Union, EU, UE, Uniunea Europeană, Uniunii Europene, Европейский союз, Європейський союз]
+  - [NATO, OTAN, Alianța Nord-Atlantică, North Atlantic Treaty Organization, НАТО]
+  - [European Commission, Comisia Europeană, Comisiei Europene]
+  - [United States, SUA, USA, US, Statele Unite, Statele Unite ale Americii]
+  - [Romania, România, României, Румыния, Румунія, Románia]
+  - [Ukraine, Ucraina, Ucrainei, Украина, Україна, Ukrajna]
+  - [Russia, Rusia, Rusiei, Россия, Росія, Federația Rusă]
+  - [Republic of Moldova, Republica Moldova, Moldova, Молдова]
+  - [Bucharest, București, Bucureşti, Бухарест]
+  - [Brussels, Bruxelles]
+# Words skipped when building an acronym from a long name ("Banca Națională a României" -> BNR).
+acronym_stopwords: [de, a, al, ai, ale, și, si, pentru, din, la, of, the, and, for, în, in]
+summary_top: 20
+# Generic words NER sometimes tags as entities; never resolved (case/diacritics-insensitive).
+ignore_mentions: [everyone, everybody, nobody, people, this summer, today, tomorrow, yesterday,
+                  toată lumea, oamenii, azi, astăzi, mâine, ieri]

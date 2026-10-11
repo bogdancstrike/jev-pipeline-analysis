@@ -1,0 +1,8 @@
+fastapi==0.118.0
+uvicorn[standard]==0.37.0
+httpx==0.28.1
+pandas==2.3.3
+pydantic-settings==2.11.0
+PyYAML==6.0.3
+python-multipart==0.0.20
+py3langid==0.3.0

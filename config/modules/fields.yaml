@@ -1,0 +1,14 @@
+# Structured fields (GLiNER2.5): typed records filled from spans of the text itself.
+# Field syntax: "name::str|list::description" (str = one value, list = several).
+enabled: true
+engine: gliner          # structured fields -> GLiNER2.5
+engine_options: {model: extract-multi}   # the general extraction checkpoint
+batch_size: 8
+records:
+  event:
+    - what::str::What happened, in a few words
+    - where::str::City, county or place where it happened
+    - when::str::Date, day or time it happened
+    - actors::list::People, groups or organizations involved
+    - casualties::str::Number of dead, injured or evacuated people
+    - amount::str::Money or damage amounts

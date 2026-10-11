@@ -1,0 +1,148 @@
+/** Mirrors backend `core/api/schemas.py` and the module result shapes in `core/modules.py`. */
+
+export type ModuleKind = "label" | "entities" | "resolved" | "relations" | "cluster";
+
+export interface ModuleInfo {
+  name: string;
+  title: string;
+  description: string;
+  kind: ModuleKind;
+  scope: "row" | "job";
+  requires: string[];
+  columns: string[];
+  engine: string | null;        // engine name from config/engines.yaml; null = local CPU logic
+  engine_kind: "systemone" | "gliner2" | "local";
+  default_on: boolean;
+  labels?: Record<string, string>;
+  review_below?: number;
+}
+
+export interface SampleInfo {
+  file: string;
+  rows: number | null;
+  bytes: number;
+  words_median: number | null;
+  languages: string[];
+}
+
+export interface AppConfig {
+  modules: ModuleInfo[];
+  engines: Record<string, { kind: string; description: string }>;
+  defaults: string[];
+  limits: { max_upload_mb: number; max_rows: number };
+  samples: SampleInfo[];
+}
+
+export interface EngineStatus {
+  name: string;
+  kind: "systemone" | "gliner2";
+  ready: boolean;
+  description: string;
+  model?: string;
+  device?: string;
+  prompt_tps?: number | null;
+  vram_reserved_mb?: number | null;
+  loaded?: string[];
+  modules: string[];
+}
+
+export interface Health {
+  status: "ready" | "loading";
+  engines: Record<string, EngineStatus>;
+  modules: Record<string, { ready: boolean; engine: string | null }>;
+}
+
+export type JobStatus = "queued" | "running" | "done" | "failed" | "cancelled";
+export const TERMINAL: JobStatus[] = ["done", "failed", "cancelled"];
+
+export interface JobSnapshot {
+  id: string;
+  filename: string;
+  status: JobStatus;
+  error: string | null;
+  modules: string[];
+  total: number;
+  done: number;
+  progress: Record<string, { done: number; errors: number }>;
+  percent: number;
+  failed_rows: number;
+  rows_per_s: number;
+  eta_s: number | null;
+  elapsed_s: number;
+  created_at: number;
+}
+
+// ------------------------------------------------------------------ module results
+export interface LabelResult {
+  label: string;
+  confidence: number;
+  top?: [string, number][];
+  score?: number;          // sentiment, toxicity
+  toxic?: boolean;         // toxicity
+  techniques?: string[];   // propaganda
+}
+
+export interface Span { start: number; end: number; text: string; label: string; score: number }
+export interface EntitiesResult { spans: Span[]; groups: Record<string, string[]> }
+
+export interface ResolvedEntity {
+  id: string; name: string; canonical?: string; label: string; mentions: string[]; spans: [number, number][];
+}
+export interface ResolvedResult { entities: ResolvedEntity[] }
+
+export interface Relation {
+  head: string; head_id?: string; head_label?: string; relation: string;
+  tail: string; tail_id?: string; tail_label?: string; confidence: number; evidence?: string;
+}
+export interface RelationsResult { relations: Relation[]; pairs_checked?: number }
+
+export interface ClusterResult { cluster: string; size: number; peers?: number[]; peer_ids?: string[]; confidence?: number }
+
+// ------------------------------------------------------------------ rows & summary
+export interface RowItem {
+  idx: number;
+  id: string;
+  preview: string;
+  results: Record<string, unknown>;
+  review: string[];
+  errors: string[];
+}
+
+export interface RowPage { total: number; items: RowItem[] }
+
+export interface RowDetail {
+  idx: number;
+  id: string;
+  text: string;
+  results: Record<string, unknown>;
+  review: string[];
+  errors: Record<string, string>;
+}
+
+export interface TopEntity { id: string; name: string; label: string; rows: number; mentions: number }
+export interface EventCluster { id: string; size: number; rows: number[]; ids: string[]; event: string | null; title: string }
+
+export interface ModuleSummary {
+  counts?: Record<string, number>;
+  needs_review?: number;
+  errors: number;
+  entities?: number;
+  top?: TopEntity[];
+  clusters?: EventCluster[];
+  pairs_checked?: number;
+  links?: number;
+}
+
+export interface JobSummary {
+  modules: Record<string, ModuleSummary>;
+  needs_review: number;
+}
+
+export interface RowQuery {
+  offset: number;
+  limit: number;
+  filters: [string, string][];
+  review: boolean;
+  errors: boolean;
+  q: string;
+}

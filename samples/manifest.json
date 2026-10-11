@@ -1,0 +1,115 @@
+[
+  {
+    "file": "sample-50.csv",
+    "rows": 50,
+    "ui": true,
+    "bytes": 257213,
+    "words_median": 634,
+    "words_min": 307,
+    "words_max": 1496,
+    "languages": [
+      "en",
+      "fr",
+      "hu",
+      "ro",
+      "ru",
+      "uk"
+    ],
+    "stories_multi_report": 15
+  },
+  {
+    "file": "sample-500.csv",
+    "rows": 500,
+    "ui": true,
+    "bytes": 2594503,
+    "words_median": 656,
+    "words_min": 300,
+    "words_max": 1496,
+    "languages": [
+      "de",
+      "en",
+      "fr",
+      "hu",
+      "ro",
+      "ru",
+      "uk"
+    ],
+    "stories_multi_report": 118
+  },
+  {
+    "file": "sample-5000.csv",
+    "rows": 5000,
+    "ui": true,
+    "bytes": 26153630,
+    "words_median": 680,
+    "words_min": 300,
+    "words_max": 1500,
+    "languages": [
+      "de",
+      "en",
+      "fr",
+      "hu",
+      "ro",
+      "ru",
+      "uk"
+    ],
+    "stories_multi_report": 1070
+  },
+  {
+    "file": "sample-15000.csv",
+    "rows": 15000,
+    "ui": true,
+    "bytes": 77673048,
+    "words_median": 677,
+    "words_min": 300,
+    "words_max": 1500,
+    "languages": [
+      "de",
+      "en",
+      "fr",
+      "hu",
+      "ro",
+      "ru",
+      "uk"
+    ],
+    "stories_multi_report": 3214
+  },
+  {
+    "file": "sample-30000.csv",
+    "rows": 30000,
+    "ui": true,
+    "bytes": 155342567,
+    "words_median": 675,
+    "words_min": 300,
+    "words_max": 1500,
+    "languages": [
+      "de",
+      "en",
+      "fr",
+      "hu",
+      "ro",
+      "ru",
+      "uk"
+    ],
+    "stories_multi_report": 6460
+  },
+  {
+    "file": "sample.csv",
+    "rows": 50000,
+    "ui": false,
+    "bytes": 258880115,
+    "words_median": 675,
+    "words_min": 300,
+    "words_max": 1500,
+    "languages": [
+      "de",
+      "en",
+      "fr",
+      "hu",
+      "ro",
+      "ru",
+      "uk"
+    ],
+    "stories_multi_report": 10801
+  }
+]

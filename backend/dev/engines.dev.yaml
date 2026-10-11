@@ -1,0 +1,10 @@
+# Engines for GPU-less local development: both point at dev/fake_models.py apps.
+engines:
+  gliner: {kind: gliner2, url: "http://localhost:9200"}
+  laya:
+    kind: systemone
+    url: http://localhost:9100
+    ready_path: /health
+    models_path: null
+    limits: {max_sequence_tokens: 2048, max_question_tokens: 512}
+    batch: {path: /v1/systemone/batch, max_states: 32}
