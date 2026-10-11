@@ -19,6 +19,7 @@ review_below: 0.8
 
 # Measured speed (docs/BENCHMARKS.md): shown in the UI's info point, used for estimates and the Fast preset.
 profile:
+  rows_per_s: 4725.2
   speed: fast
-  throughput: "≈ 4,000 articles/s on the CPU (RTX 3080, 500 articles of 300-1,500 words, task alone)"
+  throughput: "≈ 4,725 records/s on CPU; 100-document sample, median of three warm trials"
   notes: "No GPU: it never slows other tasks."

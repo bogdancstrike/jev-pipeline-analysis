@@ -47,3 +47,7 @@ Dashboard · Admin (edit task options/prompts/thresholds/engine; stored in Postg
 (cd frontend && npm install && npm test && VITE_API_TARGET=http://localhost:8088 npm run dev)
 python3 scripts/benchmark.py --sample sample-500.csv --each   # benchmark the running stack
 ```
+
+### Production on two servers
+
+Use `docker-compose.gpu.yml` on the GPU/model host and `docker-compose.app.yml` on the frontend/backend/database host. The existing local Compose remains unchanged. See [the two-server deployment guide](docs/DEPLOYMENT.md) for private endpoint configuration, shared model keys, optional engines and update commands.

@@ -63,6 +63,7 @@ class Job:
     metrics: dict[str, ModuleMetrics] = field(default_factory=dict)
     job_scoped: set[str] = field(default_factory=set)   # modules that finish all rows at once, at the end
     timeline: Timeline = field(default_factory=Timeline)
+    module_instances: list[Module] = field(default_factory=list, repr=False)
     version: int = 0                                      # bumped on every change; drives SSE
 
     def __post_init__(self) -> None:
@@ -132,6 +133,7 @@ class JobRunner:
 
     def __init__(self, job: Job, modules: list[Module]):
         self.job, self.modules = job, modules
+        job.module_instances = list(modules)
         self.by_name = {m.name: m for m in modules}
         self.dependents: dict[str, list[Module]] = {m.name: [] for m in modules}
         for m in modules:
@@ -282,6 +284,7 @@ class JobManager:
     def submit(self, filename: str, df: pd.DataFrame, modules: list[Module]) -> Job:
         job = Job(id=uuid.uuid4().hex, filename=filename, df=df, modules=[m.name for m in modules],
                   max_text_chars=self.s.max_text_chars,
+                  module_instances=list(modules),
                   job_scoped={m.name for m in modules if m.scope == Scope.JOB})
         self.jobs[job.id] = job
         task = asyncio.create_task(self._run(job, modules), name=f"job-{job.id}")

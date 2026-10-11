@@ -46,12 +46,14 @@ async def test_health_and_config_describe_every_module(api):
     names = [m["name"] for m in cfg["modules"]]
     assert names == ["language", "category", "relevance", "routing", "risk", "ner", "entity_resolution",
                      "relations", "fields", "event", "event_coreference", "sentiment", "intent",
-                     "toxicity", "propaganda"]
+                     "toxicity", "propaganda", "ioc", "genre", "emotion", "extremism", "temporal", "iptc"]
     engine_of = {m["name"]: m["engine"] for m in cfg["modules"]}
-    assert engine_of["ner"] == engine_of["category"] == engine_of["fields"] == "gliner"
+    assert engine_of["ner"] == engine_of["fields"] == "gliner"
+    assert engine_of["category"] == "laya"
     assert engine_of["sentiment"] == engine_of["risk"] == engine_of["routing"] == "laya"
     assert [x["rows"] for x in cfg["samples"]][:5] == [50, 500, 5000, 15000, 30000]
     assert all(m["labels"] for m in cfg["modules"] if m["kind"] == "label")
+    assert all(not m["default_on"] for m in cfg["modules"] if m["name"] in {"ioc", "genre", "emotion", "extremism", "temporal", "iptc"})
 
 
 @pytest.mark.asyncio
@@ -144,6 +146,61 @@ async def test_job_from_pasted_text(api):
     r = await api.post("/api/jobs/text", json={"texts": ["NATO ministers met in Brussels on Thursday."],
                                                "modules": ["language", "ner"]})
     assert r.status_code == 202 and r.json()["total"] == 1 and r.json()["filename"] == "pasted text"
+
+
+@pytest.mark.asyncio
+async def test_selected_enrichments_run_export_filter_and_use_publication_date(api):
+    text = 'Yesterday, on 10 October 2026, analysts found hxxps://example[.]org and 192.0.2.1.'
+    content = io.StringIO()
+    writer = csv.writer(content)
+    writer.writerow(['id', 'text', 'published_at'])
+    writer.writerow(['report', text, '2026-10-11'])
+    response = await api.post('/api/jobs', files={'file': ('report.csv', content.getvalue().encode(), 'text/csv')},
+                              data={'modules': 'ioc,genre,emotion,extremism,temporal'})
+    assert response.status_code == 202, response.text
+    jid = response.json()['id']
+    for _ in range(100):
+        snapshot = (await api.get(f'/api/jobs/{jid}')).json()
+        if snapshot['status'] == 'done':
+            break
+        await asyncio.sleep(0.01)
+    assert snapshot['status'] == 'done' and snapshot['failed_rows'] == 0
+    row = (await api.get(f'/api/jobs/{jid}/rows/0')).json()
+    results = row['results']
+    assert set(results) == {'ioc', 'genre', 'emotion', 'extremism', 'temporal'}
+    assert results['ioc']['spans'][0]['normalized'] == 'https://example.org'
+    assert results['temporal']['dates'][0]['normalized']['text'] == '2026-10-10'
+    assert results['temporal']['dates'][0]['reference']['text'] == '2026-10-11'
+    assert (await api.get(f'/api/jobs/{jid}/rows', params={'f': 'temporal:normalized'})).json()['total'] == 1
+    assert (await api.get(f'/api/jobs/{jid}/rows', params={'f': 'ioc:ipv4'})).json()['total'] == 1
+    exported = list(csv.DictReader(io.StringIO((await api.get(f'/api/jobs/{jid}/result.csv')).content.decode('utf-8-sig'))))[0]
+    assert exported['published_at'] == '2026-10-11'
+    assert json.loads(exported['temporal'])[0]['normalized'] == '2026-10-10'
+    assert json.loads(exported['iocs'])[0]['normalized'] == 'https://example.org'
+    for task in ('genre', 'emotion', 'extremism'):
+        assert exported[task] and exported[f'{task}_confidence']
+    metrics = (await api.get(f'/api/jobs/{jid}/metrics')).json()
+    assert metrics['modules']['temporal']['engine'] is None
+    assert metrics['modules']['ioc']['engine'] is None
+    assert set(metrics['engines']) <= {'laya', 'gliner'}
+
+
+@pytest.mark.asyncio
+async def test_timing_key_changes_with_settings_and_is_saved_in_run(api):
+    before = (await api.get('/api/config')).json()
+    original = next(m for m in before['modules'] if m['name'] == 'event')['timing_key']
+    response = await api.put('/api/admin/modules/event', json={'config': {'max_chars': 777}})
+    assert response.status_code == 200
+    after = (await api.get('/api/config')).json()
+    changed = next(m for m in after['modules'] if m['name'] == 'event')
+    assert changed['timing_key'] != original and changed['profile'] == {}
+    job = await run_sample(api, 'event')
+    run = next(r for r in (await api.get('/api/runs')).json() if r['id'] == job['id'])
+    assert run['metrics']['modules']['event']['timing_key'] == changed['timing_key']
+    # Editing Admin after a run must not relabel its timing/configuration history.
+    await api.delete('/api/admin/modules/event')
+    old_metrics = (await api.get(f'/api/jobs/{job["id"]}/metrics')).json()
+    assert old_metrics['modules']['event']['timing_key'] == changed['timing_key']
 
 
 @pytest.mark.asyncio

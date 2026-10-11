@@ -32,6 +32,11 @@ class LabelModule(Module):
         self.review_below = float(self.cfg.get("review_below", 0.5))
         self.top_k = int(self.cfg.get("top_k", 5))
         self.max_chars = int(self.cfg.get("max_chars", 0))  # 0 = whole text
+        self.fast_pass = dict(self.cfg.get("fast_pass") or {})
+        if self.fast_pass:
+            threshold = float(self.fast_pass.get("confidence_threshold", .8))
+            if not 0 <= threshold <= 1 or int(self.fast_pass.get("max_chars", 1500)) < 1:
+                raise ValueError(f"{self.name}: fast_pass needs confidence_threshold 0–1 and positive max_chars")
         self.output_columns = (self.name, f"{self.name}_confidence", *self.extra_columns)
 
     def describe(self) -> dict[str, Any]:
@@ -45,7 +50,21 @@ class LabelModule(Module):
         out: list[Any] = [None] * len(texts)
         if not live:
             return out
-        results = await self.engine.classify([texts[k] for k in live], self.question, self.engine_options)
+        # Optional, measured per-task optimization: confident short-context decisions
+        # finish early; uncertain documents get the normal context on the same model.
+        # The engine allowlist avoids carrying a Laya tuning choice over to a new engine.
+        fast = self.fast_pass if self.engine.name in self.fast_pass.get("engines", []) else {}
+        if fast:
+            results = await self.engine.classify(
+                [texts[k][:int(fast.get("max_chars", 1500))] for k in live], self.question,
+                {**self.engine_options, **fast.get("engine_options", {})})
+            refine = [i for i, result in enumerate(results) if result is None or result.confidence < float(fast.get("confidence_threshold", .8))]
+            if refine:
+                refined = await self.engine.classify([texts[live[i]] for i in refine], self.question, self.engine_options)
+                for i, result in zip(refine, refined):
+                    results[i] = result
+        else:
+            results = await self.engine.classify([texts[k] for k in live], self.question, self.engine_options)
         for k, r in zip(live, results):
             if r is None:
                 continue

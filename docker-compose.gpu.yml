@@ -1,0 +1,219 @@
+# GPU server only. Standalone: docker compose --env-file .env.gpu -f docker-compose.gpu.yml up --build -d
+# Keep API ports on the private interface and allow the application host through the firewall.
+name: triage-models
+services:
+  extractor:
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            device_ids:
+            - ${GPU_DEVICE_ID:-0}
+            capabilities:
+            - gpu
+    build: ./extractor
+    image: decision-csv-poc/extractor:latest
+    environment:
+      EXTRACTOR_API_KEY_FILE: /run/secrets/extractor_api_key
+      EXTRACTOR_GPU_MEM_FRACTION: ${EXTRACTOR_GPU_MEM_FRACTION:-0.35}
+      EXTRACTOR_RELEASE_ABOVE_MB: ${EXTRACTOR_RELEASE_ABOVE_MB:-2500}
+      EXTRACTOR_DTYPE: bfloat16
+      EXTRACTOR_LOAD_OPTIONS: ${EXTRACTOR_LOAD_OPTIONS:-{}}
+      TRITON_CACHE_DIR: /tmp/triton
+      HOME: /tmp
+      PYTORCH_CUDA_ALLOC_CONF: expandable_segments:True
+    networks:
+    - models
+    read_only: true
+    tmpfs:
+    - /tmp:exec,size=2g
+    cap_drop:
+    - ALL
+    security_opt:
+    - no-new-privileges:true
+    healthcheck:
+      test:
+      - CMD
+      - python
+      - -c
+      - import urllib.request,sys;sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8080/readyz',timeout=2).status==200
+        else 1)
+      interval: 5s
+      timeout: 5s
+      start_period: 240s
+      retries: 3
+    restart: unless-stopped
+    secrets:
+    - extractor_api_key
+    ports:
+    - ${GPU_BIND_IP:?Set GPU_BIND_IP to the GPU server private address}:18880:8080
+  laya:
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            device_ids:
+            - ${GPU_DEVICE_ID:-0}
+            capabilities:
+            - gpu
+    build: ./laya
+    image: decision-csv-poc/laya:latest
+    environment:
+      LAYA_DEVICE: cuda
+      LAYA_MODELS: english,multilingual
+      LAYA_MAX_TOKEN_BUDGET: '4096'
+      LAYA_MAX_CONCURRENT: '32'
+      LAYA_MAX_BATCH_TOKENS: ${LAYA_MAX_BATCH_TOKENS:-16384}
+      PYTORCH_CUDA_ALLOC_CONF: expandable_segments:True
+    networks:
+    - models
+    read_only: true
+    tmpfs:
+    - /tmp:exec,size=2g
+    cap_drop:
+    - ALL
+    security_opt:
+    - no-new-privileges:true
+    restart: unless-stopped
+    secrets:
+    - laya_api_key
+    ports:
+    - ${GPU_BIND_IP:?Set GPU_BIND_IP to the GPU server private address}:18881:8000
+  kev:
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            device_ids:
+            - ${GPU_DEVICE_ID:-0}
+            capabilities:
+            - gpu
+    profiles:
+    - kev
+    build: ./kev
+    image: decision-csv-poc/kev:latest
+    networks:
+    - models
+    read_only: true
+    tmpfs:
+    - /tmp:exec,size=2g
+    cap_drop:
+    - ALL
+    security_opt:
+    - no-new-privileges:true
+    restart: unless-stopped
+    secrets:
+    - kev_api_key
+    ports:
+    - ${GPU_BIND_IP:?Set GPU_BIND_IP to the GPU server private address}:18882:8009
+  llm:
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            device_ids:
+            - ${GPU_DEVICE_ID:-0}
+            capabilities:
+            - gpu
+    profiles:
+    - qwen
+    build:
+      context: ./vllm
+      args:
+        LLM_MODEL_REPO: ${LLM_MODEL_REPO:-cyankiwi/Qwen3-4B-Instruct-2507-AWQ-4bit}
+        LLM_MODEL_REVISION: ${LLM_MODEL_REVISION:-main}
+    image: decision-csv-poc/llm-vllm:latest
+    command:
+    - --served-model-name
+    - ${LLM_SERVED_NAME:-local/qwen3-4b-instruct-2507-awq}
+    - --max-model-len
+    - ${LLM_MAX_MODEL_LEN:-6144}
+    - --kv-cache-memory-bytes
+    - ${LLM_KV_CACHE_BYTES:-1610612736}
+    - --gpu-memory-utilization
+    - ${LLM_GPU_MEMORY_UTILIZATION:-0.62}
+    - --max-num-seqs
+    - '8'
+    - --max-num-batched-tokens
+    - '2048'
+    - --max-logprobs
+    - '128'
+    - --enforce-eager
+    - --enable-prefix-caching
+    - --generation-config
+    - vllm
+    - --uvicorn-log-level
+    - warning
+    shm_size: 2gb
+    networks:
+    - models
+    read_only: true
+    tmpfs:
+    - /tmp:exec,size=4g
+    cap_drop:
+    - ALL
+    security_opt:
+    - no-new-privileges:true
+    healthcheck:
+      test:
+      - CMD
+      - python3
+      - -c
+      - import urllib.request,sys;sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/health',timeout=2).status==200
+        else 1)
+      interval: 5s
+      timeout: 3s
+      start_period: 300s
+      retries: 3
+    restart: unless-stopped
+    secrets:
+    - llm_api_key
+  decider:
+    profiles:
+    - qwen
+    build:
+      context: ./decider
+      args:
+        LLM_MODEL_REPO: ${LLM_MODEL_REPO:-cyankiwi/Qwen3-4B-Instruct-2507-AWQ-4bit}
+        LLM_MODEL_REVISION: ${LLM_MODEL_REVISION:-main}
+    image: decision-csv-poc/decider:latest
+    environment:
+      LLM_URL: http://llm:8000
+      LLM_API_KEY_FILE: /run/secrets/llm_api_key
+      DECIDER_API_KEY_FILE: /run/secrets/decision_api_key
+      ASSISTANT_PREFIX: ${ASSISTANT_PREFIX:-}
+    networks:
+    - models
+    read_only: true
+    tmpfs:
+    - /tmp
+    cap_drop:
+    - ALL
+    security_opt:
+    - no-new-privileges:true
+    restart: unless-stopped
+    secrets:
+    - decision_api_key
+    - llm_api_key
+    ports:
+    - ${GPU_BIND_IP:?Set GPU_BIND_IP to the GPU server private address}:18883:8000
+    depends_on:
+      llm:
+        condition: service_healthy
+networks:
+  models: {}
+secrets:
+  extractor_api_key:
+    file: ${PROD_SECRETS_DIR:-./.secrets-prod}/extractor_api_key
+  laya_api_key:
+    file: ${PROD_SECRETS_DIR:-./.secrets-prod}/laya_api_key
+  kev_api_key:
+    file: ${PROD_SECRETS_DIR:-./.secrets-prod}/kev_api_key
+  decision_api_key:
+    file: ${PROD_SECRETS_DIR:-./.secrets-prod}/decision_api_key
+  llm_api_key:
+    file: ${PROD_SECRETS_DIR:-./.secrets-prod}/llm_api_key

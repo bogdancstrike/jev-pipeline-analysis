@@ -1,5 +1,7 @@
 # Routing (Laya): which desk should handle the document.
 enabled: true
+max_chars: 3500
+engine_options: {max_len: 1024}
 engine: laya            # routing -> Laya
 instructions: >-
   Which analyst desk should handle this document? Choose discard for content no desk needs.
@@ -17,6 +19,6 @@ labels:
 
 # Measured speed (docs/BENCHMARKS.md): shown in the UI's info point, used for estimates and the Fast preset.
 profile:
-  speed: fast
-  rows_per_s: 26.6
-  throughput: "≈ 27 articles/s (RTX 3080, 500 articles of 300-1,500 words, task alone)"
+  speed: medium
+  rows_per_s: 54.66
+  throughput: "≈ 55 records/s alone; RTX 3080, 100 documents, median of three trials"

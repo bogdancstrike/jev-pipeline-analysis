@@ -1,0 +1,11 @@
+enabled: true
+default_on: false
+languages: [en, ro]
+# Relative dates require this ISO timestamp or a row column: published_at/publication_date/date.
+# Empty means relative expressions stay unresolved, never anchored to the processing date.
+reference_date: ''
+max_mentions: 100
+profile:
+  rows_per_s: 1105.8
+  speed: fast
+  notes: 'Local date parsing, no model fallback. Relative dates require publication metadata or an explicit reference date.'

@@ -1,0 +1,91 @@
+# Application server only. Standalone: docker compose --env-file .env.app -f docker-compose.app.yml up --build -d
+# ENGINE_URLS overrides model URLs; keys copied from GPU host must match.
+name: triage-app
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: triage
+      POSTGRES_USER: triage
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    volumes:
+    - pgdata:/var/lib/postgresql/data
+    networks:
+    - data
+    security_opt:
+    - no-new-privileges:true
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - pg_isready -U triage -d triage
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+    secrets:
+    - postgres_password
+  backend:
+    build: ./backend
+    image: decision-csv-poc/backend:latest
+    environment:
+      SECRETS_DIR: /run/secrets
+      ENGINES_PATH: /config/engines.yaml
+      MODULES_DIR: /config/modules
+      SAMPLES_DIR: /samples
+      POSTGRES_HOST: postgres
+      MAX_UPLOAD_MB: '512'
+      ENGINE_URLS: ${ENGINE_URLS:?Set ENGINE_URLS to the model-server URLs as JSON}
+      MAX_PARALLEL_JOBS: ${MAX_PARALLEL_JOBS:-1}
+    volumes:
+    - ./config:/config:ro
+    - ./samples:/samples:ro
+    networks:
+    - data
+    - edge
+    read_only: true
+    tmpfs:
+    - /tmp
+    cap_drop:
+    - ALL
+    security_opt:
+    - no-new-privileges:true
+    restart: unless-stopped
+    secrets:
+    - extractor_api_key
+    - laya_api_key
+    - kev_api_key
+    - decision_api_key
+    - postgres_password
+    depends_on:
+      postgres:
+        condition: service_healthy
+  frontend:
+    build: ./frontend
+    image: decision-csv-poc/frontend:latest
+    ports:
+    - ${APP_BIND_IP:-127.0.0.1}:${UI_PORT:-8088}:8080
+    networks:
+    - edge
+    security_opt:
+    - no-new-privileges:true
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+volumes:
+  pgdata: {}
+networks:
+  data:
+    internal: true
+  edge: {}
+secrets:
+  extractor_api_key:
+    file: ${PROD_SECRETS_DIR:-./.secrets-prod}/extractor_api_key
+  laya_api_key:
+    file: ${PROD_SECRETS_DIR:-./.secrets-prod}/laya_api_key
+  kev_api_key:
+    file: ${PROD_SECRETS_DIR:-./.secrets-prod}/kev_api_key
+  decision_api_key:
+    file: ${PROD_SECRETS_DIR:-./.secrets-prod}/decision_api_key
+  postgres_password:
+    file: ${PROD_SECRETS_DIR:-./.secrets-prod}/postgres_password

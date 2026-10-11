@@ -21,6 +21,13 @@ labels:
   - date
   - money
   - weapon
+  - software
+# Fast local detectors, added after model extraction. These do not increase GPU schema size.
+pii_labels: [email, phone, cnp, personal id, iban]
+phone_region: RO
+include_numbers: true
+exclude_code: true
+money_requires_currency: true
 batch_size: 16      # rows per module batch (the engine batches inside the service)
 concurrency: 2
 

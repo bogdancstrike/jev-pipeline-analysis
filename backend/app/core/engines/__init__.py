@@ -10,6 +10,7 @@ uses are started, so an unused engine's service does not have to be running.
 import asyncio
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit
 
 import yaml
 
@@ -37,7 +38,16 @@ def load_engine_config(path: str) -> dict[str, dict[str, Any]]:
 
 class EngineRegistry:
     def __init__(self, settings: Settings, configs: dict[str, dict[str, Any]]):
-        self.settings, self.configs = settings, configs
+        unknown = set(settings.engine_urls) - configs.keys()
+        if unknown:
+            raise ValueError(f"ENGINE_URLS contains unknown engines: {sorted(unknown)}")
+        for name, url in settings.engine_urls.items():
+            parsed = urlsplit(url)
+            if parsed.scheme not in {"http", "https"} or not parsed.hostname or parsed.username or parsed.password or parsed.query or parsed.fragment:
+                raise ValueError(f"ENGINE_URLS[{name!r}] must be an HTTP(S) service URL without credentials, query or fragment")
+        self.settings = settings
+        self.configs = {name: {**cfg, **({"url": settings.engine_urls[name].rstrip('/')} if name in settings.engine_urls else {})}
+                        for name, cfg in configs.items()}
         self._engines: dict[str, Engine] = {}
 
     def get(self, name: str, kinds: tuple[str, ...] | None = None) -> Engine:

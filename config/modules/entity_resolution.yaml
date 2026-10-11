@@ -30,6 +30,7 @@ ignore_mentions: [everyone, everybody, nobody, people, this summer, today, tomor
 
 # Measured speed (docs/BENCHMARKS.md): shown in the UI's info point, used for estimates and the Fast preset.
 profile:
+  rows_per_s: 2500.0
   speed: fast
   throughput: "thousands of articles/s on the CPU (after Entities) (RTX 3080, 500 articles of 300-1,500 words, task alone)"
   notes: "Its cost is Entities, which it needs."

@@ -1,0 +1,7 @@
+enabled: true
+default_on: false
+labels: [url, domain, ipv4, ipv6, md5, sha1, sha256]
+profile:
+  rows_per_s: 2373.4
+  speed: fast
+  notes: 'Local syntax validation. An indicator match does not establish maliciousness. Defanged URLs/domains are normalized without network access.'

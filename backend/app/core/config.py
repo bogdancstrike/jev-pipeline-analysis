@@ -15,6 +15,9 @@ class Settings(BaseSettings):
     # Which models exist (URLs, keys, limits, batching): one file. Which model a task uses: the
     # module's own YAML (`engine: <name>`). Secrets: files in SECRETS_DIR named in engines.yaml.
     engines_path: str = "/config/engines.yaml"
+    # Deployment-only endpoint overrides. ENGINE_URLS is a JSON object; module engine
+    # names, credentials, limits and batching still come from engines.yaml.
+    engine_urls: dict[str, str] = {}
 
     # --- Settings store -------------------------------------------------------------------
     # Admin overrides of module settings + run history. Either a full DATABASE_URL, or the

@@ -7,3 +7,6 @@ PyYAML==6.0.3
 python-multipart==0.0.20
 py3langid==0.3.0
 psycopg[binary,pool]==3.2.10
+python-stdnum==2.2
+phonenumbers==9.0.41
+dateparser==1.4.3

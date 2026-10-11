@@ -17,6 +17,8 @@ talks to the rest of the system only through this contract:
 from __future__ import annotations
 
 import logging
+import hashlib
+import json
 from abc import ABC
 from dataclasses import dataclass
 from enum import StrEnum
@@ -66,6 +68,11 @@ class Module(ABC):
     # Engine kinds this module can run on; () = needs no model engine (pure CPU logic).
     engine_kinds: ClassVar[tuple[str, ...]] = ()
 
+    @classmethod
+    def reference(cls) -> dict[str, Any] | None:
+        """Optional offline reference vocabulary, fetched separately from task discovery."""
+        return None
+
     def __init__(self, ctx: ModuleContext):
         self.ctx = ctx
         self.cfg = ctx.config
@@ -80,6 +87,11 @@ class Module(ABC):
             if not name:
                 raise ValueError(f"{self.name}: config needs `engine:` (one of kinds {self.engine_kinds})")
             self.engine = ctx.engines.get(str(name), self.engine_kinds)
+        # Saved timings are comparable only while both task and engine settings match.
+        timing_cfg = {k: v for k, v in self.cfg.items() if k not in ("profile", "enabled", "default_on")}
+        self.timing_key = hashlib.sha256(json.dumps(
+            {"task": timing_cfg, "engine": self.engine.cfg if self.engine else None},
+            sort_keys=True, ensure_ascii=False).encode()).hexdigest()[:20]
 
     # ---------------------------------------------------------------- lifecycle
     async def start(self) -> None:
@@ -99,6 +111,7 @@ class Module(ABC):
                 "columns": list(self.output_columns),
                 "engine": self.engine.name if self.engine else None,
                 "engine_kind": self.engine.kind if self.engine else "local",
+                "timing_key": self.timing_key,
                 "default_on": bool(self.cfg.get("default_on", True)),
                 # For the UI's info point: how fast, measured where (see docs/BENCHMARKS.md).
                 "profile": dict(self.cfg.get("profile") or {})}

@@ -20,6 +20,8 @@ class PropagandaModule(LabelModule):
         return str(self.cfg.get("none_label", "none"))
 
     def derive(self, probabilities: dict[str, float]) -> dict[str, Any]:
+        if probabilities.get(self.none_label, 0) >= max(probabilities.values(), default=0):
+            return {"techniques": []}
         floor = float(self.cfg.get("min_probability", 0.2))
         found = sorted(((k, p) for k, p in probabilities.items() if k != self.none_label and p >= floor),
                        key=lambda kv: -kv[1])

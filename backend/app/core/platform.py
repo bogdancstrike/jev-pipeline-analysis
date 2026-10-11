@@ -160,6 +160,11 @@ class Platform:
         modules = []
         for m in self.registry:
             d = m.describe()
+            ignored = {"profile", "enabled", "default_on"}
+            defaults = {k: v for k, v in self.defaults(m.name).items() if k not in ignored}
+            effective = {k: v for k, v in m.cfg.items() if k not in ignored}
+            if effective != defaults:
+                d["profile"] = {}  # A different model/prompt/context needs new timings.
             d["dependents"] = [x.name for x in self.registry if m.name in x.requires]
             d["shares_engine_with"] = [x.name for x in self.registry if x is not m and m.engine and x.engine is m.engine]
             modules.append(d)
@@ -204,6 +209,8 @@ class Platform:
 
     # ---------------------------------------------------------------- per job
     def modules_of(self, job: Job) -> list[Module]:
+        if job.module_instances:
+            return job.module_instances
         return [self.registry.get(n) for n in job.modules if n in self.registry]
 
     def summary(self, job: Job) -> dict[str, Any]:
@@ -249,6 +256,7 @@ class Platform:
         for m in self.modules_of(job):
             modules[m.name] = {**job.metrics[m.name].snapshot(job.started_at, now),
                                "engine": m.engine.name if m.engine else None,
+                               "timing_key": m.timing_key,
                                "errors": len(job.errors[m.name])}
         pts = job.timeline.points
         overall = [(t, min(d.values()) if d else 0) for t, d in pts]

@@ -28,6 +28,9 @@ benchmarks/runs/
 .env
 .env.*
 !.env.example
+!.env.gpu.example
+!.env.app.example
+.secrets-prod/
 *.pem
 *.key
 

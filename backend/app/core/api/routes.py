@@ -30,6 +30,18 @@ async def config(platform: PlatformDep):
     return platform.describe()
 
 
+@router.get("/modules/{name}/reference", tags=["system"])
+async def module_reference(platform: PlatformDep, name: str):
+    """Offline reference vocabulary (including attribution/version), when a task has one."""
+    try:
+        reference = platform.module_class(name).reference()
+    except KeyError:
+        reference = None
+    if reference is None:
+        raise NotFound(f"no reference vocabulary for {name!r}")
+    return reference
+
+
 @router.get("/samples", tags=["system"])
 async def samples(platform: PlatformDep) -> list[dict[str, Any]]:
     """Sample datasets on the server (files + row counts)."""

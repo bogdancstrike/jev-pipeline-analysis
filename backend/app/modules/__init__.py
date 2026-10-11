@@ -21,6 +21,12 @@ from .risk import RiskModule
 from .routing import RoutingModule
 from .sentiment import SentimentModule
 from .toxicity import ToxicityModule
+from .genre import GenreModule
+from .emotion import EmotionModule
+from .extremism import ExtremismModule
+from .ioc import IocModule
+from .temporal import TemporalModule
+from .iptc import IptcModule
 
 CATALOG: list[type[Module]] = [
     LanguageModule,
@@ -38,4 +44,10 @@ CATALOG: list[type[Module]] = [
     IntentModule,
     ToxicityModule,
     PropagandaModule,
+    IocModule,
+    GenreModule,
+    EmotionModule,
+    ExtremismModule,
+    TemporalModule,
+    IptcModule,
 ]
