@@ -16,3 +16,9 @@ labels:
   harassment: targets a specific person with abuse or intimidation
   threat: threatens violence or harm
   sexual_content: sexually explicit or degrading content
+
+# Measured speed (docs/BENCHMARKS.md): shown in the UI's info point, used for estimates and the Fast preset.
+profile:
+  speed: fast
+  rows_per_s: 24.9
+  throughput: "≈ 25 articles/s (RTX 3080, 500 articles of 300-1,500 words, task alone)"

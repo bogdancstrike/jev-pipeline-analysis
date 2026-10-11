@@ -1,30 +1,34 @@
+import { ClockCircleOutlined, CloseCircleOutlined, DashboardOutlined, FileDoneOutlined, RiseOutlined } from "@ant-design/icons";
 import { Card, Skeleton, Table } from "antd";
 
 import type { JobSnapshot, ModuleInfo } from "../../api/types";
 import { isTerminal, useJobMetrics } from "../../hooks/queries";
 import { duration, num } from "../../lib/format";
 import { ChartCard } from "../charts/ChartCard";
-import { LineChart } from "../charts/LineChart";
+import { LineChart, useStableMax } from "../charts/LineChart";
 import { OutcomeBars } from "../charts/OutcomeBars";
 import { Timeline } from "../charts/Timeline";
 import { ErrorAlert } from "../common/ErrorAlert";
+import { StatRow, StatTile } from "../ui/StatTile";
 
 const SERIES = ["var(--series-1)", "var(--series-2)", "var(--series-3)"];
 
-function Tile({ label, value, hint }: { label: string; value: string; hint?: string }) {
-  return (
-    <div className="stat-tile">
-      <span className="stat-label">{label}</span>
-      <span className="stat-value">{value}</span>
-      {hint && <span className="stat-hint">{hint}</span>}
-    </div>
-  );
+/** Trailing-window throughput samples, for the stable y-axis. */
+function rates(m: { timeline: { t: number; done: Record<string, number> }[] }, modules: ModuleInfo[], job: JobSnapshot): number[] {
+  const rowScoped = job.modules.filter((n) => modules.find((x) => x.name === n)?.scope !== "job");
+  const d = m.timeline.map((p) => ({ x: p.t, y: Math.min(...rowScoped.map((n) => p.done[n] ?? 0)) }));
+  const k = Math.max(3, Math.round(d.length / 12));
+  return d.slice(1).map((p, i) => { const a = d[Math.max(0, i + 1 - k)]; return (p.y - a.y) / Math.max(0.001, p.x - a.x); });
 }
 
 /** Where the time went: throughput over time, each task's window, outcomes, engine latency. */
 export function PerformanceTab({ job, modules }: { job: JobSnapshot; modules: ModuleInfo[] }) {
   const q = useJobMetrics(job);
   const m = q.data;
+  const live = !isTerminal(job);
+  // Live axes: x projected to elapsed + ETA, only growing; throughput y-max only growing.
+  const xMax = useStableMax(live ? (m?.wall_s ?? 0) + (job.eta_s ?? 0) : 0, 10);
+  const rateMax = useStableMax(Math.max(0, ...(m ? rates(m, modules, job) : [0])), 1);
   if (q.error && !m) return <ErrorAlert error={q.error} onRetry={() => q.refetch()} />;
   if (!m) return <Skeleton active />;
 
@@ -64,26 +68,29 @@ export function PerformanceTab({ job, modules }: { job: JobSnapshot; modules: Mo
     key: name, engine: name, kind: e.kind, requests: e.requests, items: e.items, inflight: e.inflight,
     p50: e.latency_ms.p50 ?? "–", p95: e.latency_ms.p95 ?? "–", errors: e.errors, retries: e.retries,
   }));
-  const live = !isTerminal(job);
 
   return (
     <div className="perf">
-      <div className="stat-row">
-        <Tile label="Records processed" value={`${num(job.done)} / ${num(job.total)}`}
-              hint={live ? `${job.percent.toFixed(0)}% of all task work` : job.status} />
-        <Tile label="Elapsed" value={duration(m.wall_s)} hint={live && job.eta_s != null ? `≈ ${duration(job.eta_s)} left` : undefined} />
-        <Tile label="Average" value={`${m.rows_per_s ?? "–"} records/s`} hint="every task, end to end" />
-        <Tile label="Peak" value={`${m.peak_rows_per_s} records/s`} hint="best second" />
-        <Tile label="Failed rows" value={num(job.failed_rows)} hint={job.failed_rows ? "see Rows → Errors" : "none"} />
-      </div>
+      <StatRow>
+        <StatTile icon={<FileDoneOutlined />} label="Records processed" value={`${num(job.done)} / ${num(job.total)}`}
+                  hint={live ? `${job.percent.toFixed(0)}% of all task work` : job.status} />
+        <StatTile icon={<ClockCircleOutlined />} label="Elapsed" value={duration(m.wall_s)}
+                  hint={live && job.eta_s != null ? `≈ ${duration(job.eta_s)} left` : "wall clock"} />
+        <StatTile icon={<DashboardOutlined />} label="Average speed" value={`${m.rows_per_s ?? "–"}/s`} hint="records, every task, end to end" />
+        <StatTile icon={<RiseOutlined />} label="Peak speed" value={`${m.peak_rows_per_s}/s`} hint="best second" />
+        <StatTile icon={<CloseCircleOutlined />} tone={job.failed_rows ? "danger" : "default"} label="Failed rows"
+                  value={num(job.failed_rows)} hint={job.failed_rows ? "see Rows → Errors" : "none"} />
+      </StatRow>
 
       <div className="card-grid card-grid-2">
         <ChartCard title="Records completed" chart={
-          <LineChart points={done} ariaLabel="Records completed over time" xLabel="since start" />}
+          <LineChart points={done} ariaLabel="Records completed over time" xLabel="since start"
+                     yMax={job.total} xMax={live ? xMax : undefined} />}
           rows={done.map((p) => ({ t: `${p.x}s`, records: p.y }))} rowKey="t"
           columns={[{ title: "Time", dataIndex: "t" }, { title: "Records done", dataIndex: "records", align: "right" }]} />
         <ChartCard title="Throughput (records/s, trailing average)" chart={
-          <LineChart points={smooth} ariaLabel="Throughput over time" xLabel="since start" format={(v) => v.toFixed(v < 10 ? 1 : 0)} />}
+          <LineChart points={smooth} ariaLabel="Throughput over time" xLabel="since start" format={(v) => v.toFixed(v < 10 ? 1 : 0)}
+                     xMax={live ? xMax : undefined} yMax={live ? rateMax : undefined} />}
           rows={smooth.map((p) => ({ t: `${p.x}s`, rate: p.y }))} rowKey="t"
           columns={[{ title: "Time", dataIndex: "t" }, { title: "Records/s", dataIndex: "rate", align: "right" }]} />
         <ChartCard title="When each task ran" extra={<span className="muted small">colour = engine</span>}

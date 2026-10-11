@@ -1,11 +1,11 @@
-import { Fragment } from "react";
+import { Fragment, memo } from "react";
 
 import type { ModuleInfo, ResolvedEntity, Span } from "../../api/types";
 import { segments } from "../../lib/highlight";
 import { entityColor } from "../../lib/labels";
 
 /** The text with entities marked inline: the fastest way to judge whether NER is right. */
-export function HighlightedText({ text, spans, resolved, modules }: {
+function HighlightedTextInner({ text, spans, resolved, modules }: {
   text: string; spans: Span[]; resolved: ResolvedEntity[]; modules: ModuleInfo[];
 }) {
   // Which resolved entity a span belongs to, by exact offsets.
@@ -29,3 +29,5 @@ export function HighlightedText({ text, spans, resolved, modules }: {
     </div>
   );
 }
+
+export const HighlightedText = memo(HighlightedTextInner);

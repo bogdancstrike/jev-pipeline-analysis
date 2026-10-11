@@ -46,7 +46,7 @@ class ModuleMetrics:
             "rows": self.rows, "batches": self.batches,
             "start_s": round(self.started_at - base, 2) if self.started_at else None,
             "end_s": round(self.finished_at - base, 2) if self.finished_at else None,
-            "wall_s": round(wall, 2), "busy_s": round(self.busy_s, 2),
+            "wall_s": round(wall, 4), "busy_s": round(self.busy_s, 4),
             "parallelism": round(self.busy_s / wall, 2) if wall > 0 else None,
             "rows_per_s": round(self.rows / wall, 2) if wall > 0 else None,
             "batch_ms": {**percentiles(list(self.batch_ms)),

@@ -9,7 +9,9 @@ describe("format", () => {
   });
   it("formats durations at a readable precision", () => {
     expect(duration(null)).toBe("–");
-    expect(duration(42)).toBe("42 s");
+    expect(duration(0.005)).toBe("0.005 s");
+    expect(duration(3.274)).toBe("3.27 s");
+    expect(duration(42)).toBe("42.0 s");
     expect(duration(125)).toBe("2 min 5 s");
   });
   it("says relative times in words", () => {

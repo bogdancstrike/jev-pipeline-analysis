@@ -1,5 +1,5 @@
 import { Badge, Button, Result, Skeleton, Tabs } from "antd";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { ApiError } from "../../api/client";
 import type { AppConfig } from "../../api/types";
@@ -36,6 +36,11 @@ export function JobPage({ jobId, config, onBack }: { jobId: string; config: AppC
   const rowsQ = useRows(job, { offset: (pageNo - 1) * PAGE_SIZE, limit: PAGE_SIZE, filters,
                                review: mode === "review", errors: mode === "errors", q });
 
+  const addFilter = useCallback((f: Filter) => {
+    setFilters((cur) => [...cur.filter(([m]) => m !== f[0]), f]); // one value per module
+    setTab("rows");
+  }, []);
+
   if (jobQ.error) {
     const gone = jobQ.error instanceof ApiError && jobQ.error.status === 404;
     return gone
@@ -48,10 +53,6 @@ export function JobPage({ jobId, config, onBack }: { jobId: string; config: AppC
   const modules = config.modules;
   const columns = (storedColumns ?? defaultColumns(job)).filter((c) => job.modules.includes(c));
 
-  const addFilter = (f: Filter) => {
-    setFilters((cur) => [...cur.filter(([m]) => m !== f[0]), f]); // one value per module
-    setTab("rows");
-  };
 
   return (
     <div className="job-page">

@@ -122,7 +122,7 @@ class Job:
             "failed_rows": len(self.failed_rows()),
             "rows_per_s": round(rate, 2),
             "eta_s": round((work_total - work_done) / work_rate) if running and work_rate > 0 else None,
-            "elapsed_s": round(elapsed, 1),
+            "elapsed_s": round(elapsed, 4),
             "created_at": self.created_at,
         }
 

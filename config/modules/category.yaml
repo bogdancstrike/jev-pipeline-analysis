@@ -38,3 +38,10 @@ labels:
   entertainment: celebrities, film, TV, showbiz
   sports: football, tennis, olympics, athletes
   lifestyle_other: travel, fashion, food culture, anything else
+
+# Measured speed (docs/BENCHMARKS.md): shown in the UI's info point, used for estimates and the Fast preset.
+profile:
+  speed: slow
+  rows_per_s: 8.3
+  throughput: "≈ 8 articles/s (RTX 3080, 500 articles of 300-1,500 words, task alone)"
+  notes: "Reads every 384-word window against 30 described categories; set max_chars to classify from the lead (faster)."

@@ -14,7 +14,7 @@ export function ServiceStatus() {
   }
   const titles = Object.fromEntries((config.data?.modules ?? []).map((m) => [m.name, m.title]));
   const engines = Object.values(h.engines ?? {});
-  const onCpu = engines.filter((e) => e.ready && e.device && !/cuda|gpu|nvidia|geforce|rtx/i.test(e.device));
+  const onCpu = engines.filter((e) => e.ready && (e.degraded || (e.device && !/cuda|gpu|nvidia|geforce|rtx/i.test(e.device))));
 
   const content = (
     <Space orientation="vertical" size={12} style={{ maxWidth: 380 }}>
@@ -29,6 +29,7 @@ export function ServiceStatus() {
                   {e.prompt_tps ? ` · ${num(Math.round(e.prompt_tps))} tok/s` : ""}</>
               : "Loading weights…"}
             <br />Runs: {e.modules.map((m) => titles[m] ?? m).join(", ")}
+            {e.degraded && <><br /><span className="text-warning-strong">⚠ {e.degraded}</span></>}
           </div>
         </div>
       ))}
@@ -40,7 +41,7 @@ export function ServiceStatus() {
     <Popover content={content} title="Model engines" placement="bottomRight" trigger={["hover", "click"]}>
       <button type="button" className="status-chip" aria-label="Model status">
         <Badge status={h.status === "ready" ? (onCpu.length ? "warning" : "success") : "processing"} />
-        <span>{h.status === "ready" ? "Models ready" : "Models loading"}</span>
+        <span>{h.status === "ready" ? "Models ready" : h.status === "degraded" ? "Models slowed: GPU memory" : "Models loading"}</span>
       </button>
     </Popover>
   );

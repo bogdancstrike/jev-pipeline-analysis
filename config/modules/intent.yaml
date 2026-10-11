@@ -16,3 +16,9 @@ labels:
   advertise: promote a product, service or event commercially
   scam: deceive the reader for money or data (fake offers, phishing)
   entertain: humor, gossip, entertainment
+
+# Measured speed (docs/BENCHMARKS.md): shown in the UI's info point, used for estimates and the Fast preset.
+profile:
+  speed: fast
+  rows_per_s: 24.1
+  throughput: "≈ 24 articles/s (RTX 3080, 500 articles of 300-1,500 words, task alone)"

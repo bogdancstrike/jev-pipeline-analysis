@@ -1,5 +1,5 @@
 import { Tooltip } from "antd";
-import { useState } from "react";
+import { useState, memo } from "react";
 
 export interface Bar { key: string; label: string; value: number; color?: string; hint?: string }
 
@@ -7,7 +7,7 @@ export interface Bar { key: string; label: string; value: number; color?: string
  * Horizontal bars as a list: readable labels, exact counts, and each row a filter button.
  * Chosen over a chart library: the question is always "how many of each", answered at a glance.
  */
-export function BarList({ bars, total, selected, onSelect, limit = 8 }: {
+function BarListInner({ bars, total, selected, onSelect, limit = 8 }: {
   bars: Bar[]; total?: number; selected?: string; onSelect?: (key: string) => void; limit?: number;
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -43,3 +43,5 @@ export function BarList({ bars, total, selected, onSelect, limit = 8 }: {
     </ul>
   );
 }
+
+export const BarList = memo(BarListInner);

@@ -21,6 +21,13 @@ export const keys = {
 
 export const isTerminal = (s?: JobSnapshot | null) => !!s && TERMINAL.includes(s.status);
 
+/**
+ * The UI's update cadence for live data. Faster than this, numbers and charts change more
+ * often than anyone can read them and the page reads as flicker; everything live (SSE
+ * snapshots, polls) is held to it.
+ */
+export const UPDATE_MS = 2_000;
+
 /** Fast polling while models load (cold start takes a minute or two), slow once ready. */
 export function useHealth() {
   return useQuery({
@@ -57,16 +64,33 @@ export function useLiveJob(id: string | null) {
   useEffect(() => {
     if (!id || !query.data || terminal) return;
     let timer = 0;
+    // Snapshots arrive faster than anyone reads them: keep the latest, commit it to the cache
+    // (and so to the UI) at most every UPDATE_MS; a final snapshot is committed at once.
+    let pending: JobSnapshot | null = null;
+    let lastCommit = 0;
+    let flushTimer = 0;
+    const commit = () => {
+      if (pending) qc.setQueryData(keys.job(id), pending);
+      pending = null;
+      lastCommit = Date.now();
+      flushTimer = 0;
+    };
     const stop = watchJob(
       id,
-      (snap) => qc.setQueryData(keys.job(id), snap),
+      (snap) => {
+        pending = snap;
+        if (isTerminal(snap)) { window.clearTimeout(flushTimer); commit(); return; }
+        const wait = UPDATE_MS - (Date.now() - lastCommit);
+        if (wait <= 0) commit();
+        else if (!flushTimer) flushTimer = window.setTimeout(commit, wait);
+      },
       () => {
         timer = window.setTimeout(() => {
           qc.invalidateQueries({ queryKey: keys.job(id), exact: true }).finally(() => setEpoch((e) => e + 1));
         }, 1500);
       },
     );
-    return () => { stop(); clearTimeout(timer); };
+    return () => { stop(); clearTimeout(timer); clearTimeout(flushTimer); };
   }, [id, terminal, epoch, qc, !!query.data]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // When the job stops, everything derived from it is final: refresh once.
@@ -87,7 +111,7 @@ export function useSummary(job: JobSnapshot | undefined) {
     queryFn: ({ signal }) => api.summary(job!.id, signal),
     enabled: !!job,
     // Summaries walk every row: poll gently on big jobs.
-    refetchInterval: job && !isTerminal(job) ? (job.total > 5_000 ? 5_000 : 2_000) : false,
+    refetchInterval: job && !isTerminal(job) ? (job.total > 5_000 ? 5_000 : UPDATE_MS) : false,
     placeholderData: keepPreviousData,
   });
 }
@@ -108,7 +132,7 @@ export function useRow(jobId: string, idx: number | null, live: boolean) {
     queryKey: keys.row(jobId, idx ?? -1),
     queryFn: ({ signal }) => api.row(jobId, idx!, signal),
     enabled: idx !== null,
-    refetchInterval: live ? 3_000 : false,
+    refetchInterval: live ? UPDATE_MS * 2 : false,
   });
 }
 
@@ -118,7 +142,7 @@ export function useJobMetrics(job: JobSnapshot | undefined) {
     queryKey: [...keys.metrics(job?.id ?? ""), job?.status],
     queryFn: ({ signal }) => api.metrics(job!.id, signal),
     enabled: !!job,
-    refetchInterval: job && !isTerminal(job) ? 1_000 : false,
+    refetchInterval: job && !isTerminal(job) ? UPDATE_MS : false,
     placeholderData: keepPreviousData,
   });
 }
@@ -129,5 +153,5 @@ export function useRuns() {
 
 export function useEngineMetrics() {
   return useQuery({ queryKey: keys.engineMetrics, queryFn: ({ signal }) => api.engineMetrics(signal),
-                    refetchInterval: 2_000 });
+                    refetchInterval: 5_000 });
 }

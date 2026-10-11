@@ -62,7 +62,12 @@ export function AppShell({ page, title, onNavigate, onOpenJob, children }: {
       </Layout.Sider>
       <Layout>
         <header className="topbar">
-          <h1 className="topbar-title">{title ?? TITLES[page]}</h1>
+          <nav className="crumbs" aria-label="Breadcrumb">
+            <span className="crumb-app">Text triage</span>
+            <span className="crumb-sep">/</span>
+            <h1 className="topbar-title">{TITLES[page]}</h1>
+            {title && <><span className="crumb-sep">/</span><span className="crumb-leaf">{title}</span></>}
+          </nav>
           <div className="header-right">
             <ServiceStatus />
             <Segmented<Appearance> size="small" value={appearance} onChange={setAppearance} aria-label="Appearance"

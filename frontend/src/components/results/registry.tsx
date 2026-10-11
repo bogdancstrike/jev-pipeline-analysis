@@ -4,6 +4,7 @@ import type { ModuleInfo, ModuleKind } from "../../api/types";
 import { EntitiesCell, EntitiesDetail, ResolvedCell, ResolvedDetail } from "./EntityViews";
 import { LabelCell, LabelDetail } from "./LabelView";
 import { ClusterCell, ClusterDetail, RelationsCell, RelationsDetail } from "./RelationViews";
+import { FieldsCell, FieldsDetail } from "./RecordViews";
 
 export interface RenderContext {
   module: ModuleInfo;
@@ -40,6 +41,10 @@ export const RENDERERS: Record<ModuleKind, Renderer> = {
   relations: {
     cell: (v) => <RelationsCell value={v} />,
     detail: (v, c) => <RelationsDetail value={v} modules={c.modules} />,
+  },
+  record: {
+    cell: (v) => <FieldsCell value={v} />,
+    detail: (v) => <FieldsDetail value={v} />,
   },
   cluster: {
     cell: (v) => <ClusterCell value={v} />,

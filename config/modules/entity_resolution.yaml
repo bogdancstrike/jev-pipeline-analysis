@@ -27,3 +27,9 @@ summary_top: 20
 # Generic words NER sometimes tags as entities; never resolved (case/diacritics-insensitive).
 ignore_mentions: [everyone, everybody, nobody, people, this summer, today, tomorrow, yesterday,
                   toată lumea, oamenii, azi, astăzi, mâine, ieri]
+
+# Measured speed (docs/BENCHMARKS.md): shown in the UI's info point, used for estimates and the Fast preset.
+profile:
+  speed: fast
+  throughput: "thousands of articles/s on the CPU (after Entities) (RTX 3080, 500 articles of 300-1,500 words, task alone)"
+  notes: "Its cost is Entities, which it needs."

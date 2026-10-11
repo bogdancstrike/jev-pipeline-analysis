@@ -152,7 +152,8 @@ async def delete_job(job: JobDep, platform: PlatformDep):
 
 @router.get("/jobs/{job_id}/events", tags=["jobs"])
 async def job_events(request: Request, job: JobDep):
-    """Server-Sent Events: one snapshot whenever the job changed, at most ~4/s."""
+    """Server-Sent Events: one snapshot whenever the job changed, at most once a second
+    (the UI commits at most every 2 s; a keep-alive comment keeps proxies from timing out)."""
     async def stream():
         seen = -1
         while not await request.is_disconnected():
@@ -163,7 +164,7 @@ async def job_events(request: Request, job: JobDep):
                     return
             else:
                 yield ": keep-alive\n\n"
-            await asyncio.sleep(0.25)
+            await asyncio.sleep(1.0)
 
     return StreamingResponse(stream(), media_type="text/event-stream",
                              headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"})

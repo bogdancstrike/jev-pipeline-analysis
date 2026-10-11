@@ -6,7 +6,10 @@ import { api } from "../../api/endpoints";
 import type { AppConfig, JobSnapshot } from "../../api/types";
 import { useHealth } from "../../hooks/queries";
 import { useStoredState } from "../../hooks/useUrlState";
-import { ModulePicker } from "./ModulePicker";
+import { ModulePicker, Presets } from "./ModulePicker";
+import { RunSummary } from "./RunSummary";
+import { PageHeader } from "../ui/PageHeader";
+import { Section } from "../ui/Section";
 import { SamplePicker } from "./SamplePicker";
 
 const SEPARATOR = /^\s*---+\s*$/m;
@@ -67,16 +70,17 @@ export function NewRun({ config, onStarted }: { config: AppConfig; onStarted: (j
   const articles = splitArticles(text);
 
   return (
-    <section className="panel new-run" aria-labelledby="new-run-title">
-      <h2 id="new-run-title" className="page-title">Analyze texts</h2>
-      <p className="lede">
-        Pick the analyses, then give it text: a built-in sample, a CSV with <code>id</code> and <code>text</code> columns,
-        or articles pasted below. Everything runs on this server's GPU; no text leaves the machine.
-      </p>
-
-      <ModulePicker config={config} selected={selected} onChange={setSelected} disabled={busy} />
-      {blockedWhy && <div className="blocked-why">{blockedWhy}</div>}
-
+    <div className="newrun">
+      <PageHeader title="New analysis"
+        description="Pick the analyses, then give it text: a built-in sample, a CSV, or articles pasted in. Everything runs on this server's GPU; no text leaves the machine." />
+      <div className="newrun-grid">
+        <div className="newrun-main">
+          <Section step={1} title="Choose analyses" description={`${selected.length} of ${config.modules.length} selected. Hover ⓘ for what each one outputs and costs.`}
+                   extra={<Presets modules={config.modules} selected={selected} onChange={setSelected} disabled={busy} />}>
+            <ModulePicker config={config} selected={selected} onChange={setSelected} disabled={busy} />
+            {blockedWhy && <div className="blocked-why">{blockedWhy}</div>}
+          </Section>
+          <Section step={2} title="Add text">
       <Tabs activeKey={tab} onChange={setTab} className="input-tabs" items={[
         {
           key: "samples", label: "Sample datasets",
@@ -121,6 +125,10 @@ export function NewRun({ config, onStarted }: { config: AppConfig; onStarted: (j
           ),
         },
       ]} />
-    </section>
+          </Section>
+        </div>
+        <RunSummary config={config} selected={selected} />
+      </div>
+    </div>
   );
 }

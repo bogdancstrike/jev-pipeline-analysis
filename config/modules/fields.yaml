@@ -12,3 +12,9 @@ records:
     - actors::list::People, groups or organizations involved
     - casualties::str::Number of dead, injured or evacuated people
     - amount::str::Money or damage amounts
+
+# Measured speed (docs/BENCHMARKS.md): shown in the UI's info point, used for estimates and the Fast preset.
+profile:
+  speed: medium
+  rows_per_s: 16.3
+  throughput: "≈ 16 articles/s (RTX 3080, 500 articles of 300-1,500 words, task alone)"

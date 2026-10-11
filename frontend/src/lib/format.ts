@@ -2,10 +2,11 @@ export const pct = (p: number, digits = 0) => `${(p * 100).toFixed(digits)}%`;
 
 export const num = (n: number) => n.toLocaleString("en-US");
 
+/** Real durations at a readable precision: 0.005 s, 0.482 s, 3.27 s, 12.3 s, 2 min 5 s. */
 export function duration(s: number | null | undefined): string {
   if (s == null) return "–";
-  if (s < 1) return "<1 s";
-  if (s < 60) return `${Math.round(s)} s`;
+  if (s < 10) return `${s < 1 ? s.toFixed(3) : s.toFixed(2)} s`;
+  if (s < 60) return `${s.toFixed(1)} s`;
   const m = Math.floor(s / 60);
   if (m < 60) return `${m} min ${Math.round(s % 60)} s`;
   return `${Math.floor(m / 60)} h ${m % 60} min`;

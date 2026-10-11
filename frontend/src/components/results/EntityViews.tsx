@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Space, Tag, Tooltip, Typography } from "antd";
 
 import type { EntitiesResult, ModuleInfo, ResolvedResult } from "../../api/types";
@@ -21,13 +22,13 @@ function TagRow({ items, modules, max }: {
 }
 
 /** NER preview is `{label: [surface…]}`. */
-export function EntitiesCell({ value, modules }: { value: unknown; modules: ModuleInfo[] }) {
+function EntitiesCellInner({ value, modules }: { value: unknown; modules: ModuleInfo[] }) {
   const groups = (value as Record<string, string[]> | null) ?? {};
   const items = Object.entries(groups).flatMap(([label, vs]) => vs.map((v) => ({ key: `${label}:${v}`, text: v, label })));
   return <TagRow items={items} modules={modules} max={4} />;
 }
 
-export function EntitiesDetail({ value, modules }: { value: unknown; modules: ModuleInfo[] }) {
+function EntitiesDetailInner({ value, modules }: { value: unknown; modules: ModuleInfo[] }) {
   const r = value as EntitiesResult | null;
   const groups = Object.entries(r?.groups ?? {});
   if (!groups.length) return <span className="muted">No entities found.</span>;
@@ -44,13 +45,13 @@ export function EntitiesDetail({ value, modules }: { value: unknown; modules: Mo
 }
 
 /** Resolved preview is `[{id, name, label}]`. */
-export function ResolvedCell({ value, modules }: { value: unknown; modules: ModuleInfo[] }) {
+function ResolvedCellInner({ value, modules }: { value: unknown; modules: ModuleInfo[] }) {
   const ents = (value as { id: string; name: string; label: string }[] | null) ?? [];
   return <TagRow items={ents.map((e) => ({ key: e.id, text: e.name, label: e.label, hint: `${e.label} · ${e.id}` }))}
                  modules={modules} max={4} />;
 }
 
-export function ResolvedDetail({ value, modules, onFilter }: {
+function ResolvedDetailInner({ value, modules, onFilter }: {
   value: unknown; modules: ModuleInfo[]; onFilter?: (value: string) => void;
 }) {
   const r = value as ResolvedResult | null;
@@ -79,3 +80,11 @@ export function ResolvedDetail({ value, modules, onFilter }: {
     </div>
   );
 }
+
+export const EntitiesCell = memo(EntitiesCellInner);
+
+export const ResolvedCell = memo(ResolvedCellInner);
+
+export const EntitiesDetail = memo(EntitiesDetailInner);
+
+export const ResolvedDetail = memo(ResolvedDetailInner);

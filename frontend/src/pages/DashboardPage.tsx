@@ -1,14 +1,13 @@
+import { ApiOutlined, DashboardOutlined, FileDoneOutlined, HistoryOutlined } from "@ant-design/icons";
 import { Card, Empty, Table } from "antd";
 
 import type { RunRecord } from "../api/types";
 import { ChartCard } from "../components/charts/ChartCard";
-import { LineChart } from "../components/charts/LineChart";
+import { LineChart, useStableMax } from "../components/charts/LineChart";
+import { PageHeader } from "../components/ui/PageHeader";
+import { StatRow, StatTile } from "../components/ui/StatTile";
 import { useAppConfig, useEngineMetrics, useJobMetrics, useJobs, useRuns } from "../hooks/queries";
 import { duration, num } from "../lib/format";
-
-function Tile({ label, value, hint }: { label: string; value: string; hint?: string }) {
-  return <div className="stat-tile"><span className="stat-label">{label}</span><span className="stat-value">{value}</span>{hint && <span className="stat-hint">{hint}</span>}</div>;
-}
 
 /** One labelled horizontal bar per run, newest first, value at the tip (no rank colouring). */
 function RunBars({ runs, titleOf }: { runs: RunRecord[]; titleOf: (n: string) => string }) {
@@ -35,17 +34,18 @@ function LiveJob() {
   const job = (jobs.data ?? []).find((j) => j.status === "running");
   const m = useJobMetrics(job);
   const config = useAppConfig();
+  const xMax = useStableMax(job ? job.elapsed_s + (job.eta_s ?? 0) : 0, 10);
   if (!job) return <Card size="small" className="module-card" title="Running now"><Empty description="Nothing running" image={Empty.PRESENTED_IMAGE_SIMPLE} /></Card>;
   const rowScoped = job.modules.filter((n) => config.data?.modules.find((x) => x.name === n)?.scope !== "job");
   const pts = (m.data?.timeline ?? []).map((p) => ({ x: p.t, y: Math.min(...rowScoped.map((n) => p.done[n] ?? 0)) }));
   return (
     <Card size="small" className="module-card" title={`Running now · ${job.filename}`}>
-      <div className="stat-row">
-        <Tile label="Records processed" value={`${num(job.done)} / ${num(job.total)}`} hint={`${job.percent.toFixed(0)}% of task work`} />
-        <Tile label="Speed" value={`${job.rows_per_s} records/s`} hint={job.eta_s != null ? `≈ ${duration(job.eta_s)} left` : undefined} />
-        <Tile label="Elapsed" value={duration(job.elapsed_s)} />
-      </div>
-      <LineChart points={pts} ariaLabel="Records completed over time" xLabel="since start" />
+      <StatRow>
+        <StatTile label="Records processed" value={`${num(job.done)} / ${num(job.total)}`} hint={`${job.percent.toFixed(0)}% of task work`} />
+        <StatTile label="Speed" value={`${job.rows_per_s}/s`} hint={job.eta_s != null ? `≈ ${duration(job.eta_s)} left` : "records"} />
+        <StatTile label="Elapsed" value={duration(job.elapsed_s)} />
+      </StatRow>
+      <LineChart points={pts} ariaLabel="Records completed over time" xLabel="since start" yMax={job.total} xMax={xMax} />
     </Card>
   );
 }
@@ -76,12 +76,13 @@ export function DashboardPage() {
 
   return (
     <div className="dashboard">
-      <div className="stat-row">
-        <Tile label="Finished runs" value={num(done.length)} />
-        <Tile label="Records processed" value={num(totalRecords)} />
-        <Tile label="Average speed" value={totalTime ? `${(totalRecords / totalTime).toFixed(1)} records/s` : "–"} hint="all finished runs" />
-        <Tile label="Engine requests" value={num(engineRows.reduce((a, e) => a + e.requests, 0))} hint="since the backend started" />
-      </div>
+      <PageHeader title="Dashboard" description="What is running, how the model engines behave, and how past runs performed. Updates every 2 seconds." />
+      <StatRow>
+        <StatTile icon={<HistoryOutlined />} label="Finished runs" value={num(done.length)} hint="kept in the database" />
+        <StatTile icon={<FileDoneOutlined />} label="Records processed" value={num(totalRecords)} hint="all finished runs" />
+        <StatTile icon={<DashboardOutlined />} label="Average speed" value={totalTime ? `${(totalRecords / totalTime).toFixed(1)}/s` : "–"} hint="records, all finished runs" />
+        <StatTile icon={<ApiOutlined />} label="Engine requests" value={num(engineRows.reduce((a, e) => a + e.requests, 0))} hint="since the backend started" />
+      </StatRow>
       <div className="card-grid card-grid-2">
         <LiveJob />
         <ChartCard title="Records/s per run (latest 15)" chart={done.length ? <RunBars runs={done} titleOf={title} /> : <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} />}

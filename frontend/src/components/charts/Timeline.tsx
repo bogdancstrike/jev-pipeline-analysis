@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Tooltip } from "antd";
 
 export interface Span { key: string; label: string; start: number; end: number; color: string; detail: string; group: string }
@@ -6,7 +7,7 @@ export interface Span { key: string; label: string; start: number; end: number; 
  * When each module ran within the job: one bar per module from first to last batch, colour
  * by engine (identity), labelled directly so colour is never the only channel.
  */
-export function Timeline({ spans, total, groups }: {
+function TimelineInner({ spans, total, groups }: {
   spans: Span[]; total: number; groups: { key: string; label: string; color: string }[];
 }) {
   const max = Math.max(total, ...spans.map((s) => s.end), 0.001);
@@ -30,3 +31,5 @@ export function Timeline({ spans, total, groups }: {
     </div>
   );
 }
+
+export const Timeline = memo(TimelineInner);

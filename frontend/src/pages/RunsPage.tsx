@@ -6,6 +6,7 @@ import { api } from "../api/endpoints";
 import type { JobSnapshot, RunRecord } from "../api/types";
 import { EmptyState } from "../components/common/EmptyState";
 import { StatusTag } from "../components/common/StatusTag";
+import { PageHeader } from "../components/ui/PageHeader";
 import { keys, useJobs, useRuns } from "../hooks/queries";
 import { ago, duration, num, plural } from "../lib/format";
 
@@ -46,7 +47,11 @@ export function RunsPage({ onOpen }: { onOpen: (id: string) => void }) {
   if (!rows.length && !jobs.isLoading) {
     return <div className="panel"><EmptyState title="No runs yet" hint="Start one from New analysis." /></div>;
   }
+  const running = rows.filter((r) => r.status === "running" || r.status === "queued").length;
   return (
+    <>
+    <PageHeader title="Runs" description="Every analysis started on this server. Open a live run to see its results and performance; finished runs stay in the history after a restart."
+                meta={<><span className="meta-chip">{rows.length} runs</span>{running > 0 && <span className="meta-chip">{running} running</span>}</>} />
     <div className="panel panel-flush">
       <Table<Row> rowKey="id" dataSource={rows} loading={jobs.isLoading} size="middle" scroll={{ x: "max-content" }}
         pagination={{ pageSize: 25, hideOnSinglePage: true }}
@@ -68,5 +73,6 @@ export function RunsPage({ onOpen }: { onOpen: (id: string) => void }) {
               </Tooltip>) },
         ]} />
     </div>
+    </>
   );
 }

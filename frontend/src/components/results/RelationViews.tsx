@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { ArrowRightOutlined } from "@ant-design/icons";
 import { Tooltip, Typography } from "antd";
 
@@ -15,7 +16,7 @@ function Triple({ r }: { r: Pick<Relation, "head" | "relation" | "tail"> }) {
   );
 }
 
-export function RelationsCell({ value }: { value: unknown }) {
+function RelationsCellInner({ value }: { value: unknown }) {
   const rels = (value as Relation[] | null) ?? [];
   if (!rels.length) return <span className="muted">–</span>;
   return (
@@ -25,7 +26,7 @@ export function RelationsCell({ value }: { value: unknown }) {
   );
 }
 
-export function RelationsDetail({ value, modules }: { value: unknown; modules: ModuleInfo[] }) {
+function RelationsDetailInner({ value, modules }: { value: unknown; modules: ModuleInfo[] }) {
   const rels = ((value as { relations?: Relation[] } | null)?.relations) ?? [];
   if (!rels.length) return <span className="muted">No relation stated between the entities in this text.</span>;
   return (
@@ -44,13 +45,13 @@ export function RelationsDetail({ value, modules }: { value: unknown; modules: M
   );
 }
 
-export function ClusterCell({ value }: { value: unknown }) {
+function ClusterCellInner({ value }: { value: unknown }) {
   const c = value as ClusterResult | null;
   if (!c) return <span className="muted">–</span>;
   return <Tooltip title={`Reported in ${c.size} rows`}><span className="pill mono">{c.cluster} · {c.size}</span></Tooltip>;
 }
 
-export function ClusterDetail({ value, onOpenRow }: { value: unknown; onOpenRow?: (idx: number) => void }) {
+function ClusterDetailInner({ value, onOpenRow }: { value: unknown; onOpenRow?: (idx: number) => void }) {
   const c = value as ClusterResult | null;
   if (!c) return <span className="muted">No other row reports this event.</span>;
   return (
@@ -67,3 +68,11 @@ export function ClusterDetail({ value, onOpenRow }: { value: unknown; onOpenRow?
     </div>
   );
 }
+
+export const RelationsCell = memo(RelationsCellInner);
+
+export const ClusterCell = memo(ClusterCellInner);
+
+export const RelationsDetail = memo(RelationsDetailInner);
+
+export const ClusterDetail = memo(ClusterDetailInner);

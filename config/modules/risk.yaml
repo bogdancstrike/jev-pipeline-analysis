@@ -12,3 +12,9 @@ labels:
   medium: a real but contained risk
   high: serious harm, threats or disruption, now or imminent
   critical: loss of life, attacks or nationwide disruption
+
+# Measured speed (docs/BENCHMARKS.md): shown in the UI's info point, used for estimates and the Fast preset.
+profile:
+  speed: fast
+  rows_per_s: 27.0
+  throughput: "≈ 27 articles/s (RTX 3080, 500 articles of 300-1,500 words, task alone)"

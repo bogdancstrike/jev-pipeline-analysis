@@ -89,6 +89,7 @@ class SystemOneEngine(Engine):
                         self.info["loaded"] = body["loaded"]
                     if "device" in body:
                         self.info["device"] = body["device"]
+                    self._check_degraded(body)
                 if self.models_path:
                     await self._discover()
                 self.info.update(model=self.model or self.name, max_sequence_tokens=self.max_sequence_tokens,
@@ -99,6 +100,22 @@ class SystemOneEngine(Engine):
             except (httpx.HTTPError, EngineError, ValueError) as e:
                 log.info("waiting for engine %s: %s", self.name, e)
                 await asyncio.sleep(poll_s)
+
+    def _check_degraded(self, body: dict) -> None:
+        """Laya moves a checkpoint to the CPU after a CUDA OOM and keeps serving, ~30x slower.
+        Surface that, or the only symptom is a pipeline that crawls."""
+        cpu = [n for n, d in (body.get("checkpoint_devices") or {}).items() if d == "cpu"]
+        self.info["degraded"] = (f"{', '.join(cpu)} running on the CPU (GPU memory ran out): restart the "
+                                 f"{self.name} service" if cpu else None)
+
+    async def refresh(self) -> None:
+        """Re-read the readiness endpoint (device state can change while running)."""
+        try:
+            r = await self._clients[0].get(self.ready_path)
+            if r.status_code == 200 and r.headers.get("content-type", "").startswith("application/json"):
+                self._check_degraded(r.json())
+        except httpx.HTTPError:
+            pass
 
     async def _discover(self) -> None:
         """Read limits the server publishes (the decider does); config values win if set."""

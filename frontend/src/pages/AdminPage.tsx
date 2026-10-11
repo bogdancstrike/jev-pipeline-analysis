@@ -7,6 +7,7 @@ import { ApiError } from "../api/client";
 import { api } from "../api/endpoints";
 import type { AdminModule } from "../api/types";
 import { ErrorAlert } from "../components/common/ErrorAlert";
+import { PageHeader } from "../components/ui/PageHeader";
 import { keys } from "../hooks/queries";
 import { ago } from "../lib/format";
 
@@ -85,7 +86,7 @@ function Editor({ m }: { m: AdminModule }) {
     <div className="admin-editor">
       <div className="admin-head">
         <div>
-          <h2 className="page-title">{m.title} {m.override ? <Tag color="processing" variant="filled">customised</Tag> : <Tag variant="outlined">defaults</Tag>}</h2>
+          <h3 className="section-heading admin-title">{m.title} {m.override ? <Tag color="processing" variant="filled">customised</Tag> : <Tag variant="outlined">defaults</Tag>}</h3>
           <Typography.Text type="secondary">{m.description}</Typography.Text>
         </div>
         <span className="admin-actions">
@@ -182,6 +183,7 @@ export function AdminPage() {
   const current = q.data.find((m) => m.name === sel) ?? q.data[0];
   return (
     <div className="admin">
+      <PageHeader title="Admin" description="Change what each task does: its options, the question it asks, thresholds and the model that runs it. Saved settings are validated first, stored in the database and used by new runs." />
       {engines.data?.store === "memory" && (
         <Alert type="warning" showIcon title="Settings are kept in memory" style={{ marginBottom: 16 }}
                description="No database is configured, so changes are lost when the backend restarts." />

@@ -28,3 +28,10 @@ labels:
   - nationality
 batch_size: 16      # rows per module batch (the engine batches inside the service)
 concurrency: 2
+
+# Measured speed (docs/BENCHMARKS.md): shown in the UI's info point, used for estimates and the Fast preset.
+profile:
+  speed: fast
+  rows_per_s: 20.7
+  throughput: "≈ 21 articles/s (RTX 3080, 500 articles of 300-1,500 words, task alone)"
+  notes: "Cost grows with the number of labels: fewer, distinct labels are faster."

@@ -72,8 +72,11 @@ export function JobHeader({ job, modules, onBack }: { job: JobSnapshot; modules:
         <div className="live" aria-live="polite">
           <div className="live-counter">
             <span className="live-num">{num(job.done)}</span>
-            <span className="live-of">/ {num(job.total)} records processed</span>
-            <span className="live-rate">{job.rows_per_s} records/s</span>
+            <span className="live-of">/ {num(job.total)} records complete</span>
+            <Tooltip title="A record is complete when every selected task has processed it. Tasks run side by side, so task work moves ahead of complete records.">
+              <span className="live-pct">{Math.floor(job.percent)}% of task work done</span>
+            </Tooltip>
+            <span className="live-rate">{job.rows_per_s} records/s{job.eta_s != null ? ` · ≈ ${duration(job.eta_s)} left` : ""}</span>
           </div>
           <Progress percent={Math.floor(job.percent)} status="active" showInfo={false} />
           <ModuleProgress job={job} modules={modules} />

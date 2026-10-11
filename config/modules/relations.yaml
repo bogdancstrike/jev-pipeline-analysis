@@ -34,3 +34,9 @@ max_pairs: 6            # systemone strategy: per row, nearest pairs first; each
 max_relations: 12       # gliner2 strategy: keep at most this many per row, best first
 min_confidence: 0.4     # min(head score, tail score) to keep a relation
 context_chars: 600      # evidence sentence shown with each relation
+
+# Measured speed (docs/BENCHMARKS.md): shown in the UI's info point, used for estimates and the Fast preset.
+profile:
+  speed: medium
+  rows_per_s: 13.0
+  throughput: "≈ 13 articles/s for the relation pass; ≈ 8 articles/s end to end with the Entities it needs (RTX 3080, 500 articles of 300-1,500 words, task alone)"

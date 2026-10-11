@@ -1,4 +1,14 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, memo } from "react";
+
+/**
+ * An axis bound that only grows, in 25% steps: a live chart must not rescale every second
+ * (the whole line re-squeezes and reads as flicker), only when the data outgrows it.
+ */
+export function useStableMax(value: number, floor = 1): number {
+  const ref = useRef(Math.max(floor, value));
+  if (value > ref.current) ref.current = Math.max(value, ref.current * 1.25);
+  return ref.current;
+}
 
 export interface Point { x: number; y: number }
 
@@ -18,24 +28,26 @@ export function niceTicks(max: number, count = 4): number[] {
  * One series over time: 2px line, ~10% area wash, hairline grid, crosshair + tooltip on hover.
  * One series only (no legend box: the card title names it). For several, use small multiples.
  */
-export function LineChart({ points, height = 200, xLabel, format = (v) => v.toLocaleString(), xFormat = (v) => `${v}s`,
-                            color = "var(--series-1)", ariaLabel }: {
+function LineChartInner({ points, height = 200, xLabel, format = (v) => v.toLocaleString(), xFormat = (v) => `${v}s`,
+                            color = "var(--series-1)", ariaLabel, xMax: xMaxHint, yMax: yMaxHint }: {
   points: Point[]; height?: number; xLabel?: string; format?: (v: number) => string; xFormat?: (v: number) => string;
   color?: string; ariaLabel: string;
+  /** Fixed or growing axis bounds; without them the axes follow the data (fine for finished runs). */
+  xMax?: number; yMax?: number;
 }) {
   const ref = useRef<SVGSVGElement>(null);
   const [hover, setHover] = useState<number | null>(null);
   const W = 640, H = height, L = 48, R = 16, T = 12, B = 28;
   const { xs, ys, yTicks, xMax, path, area } = useMemo(() => {
-    const xMax = Math.max(1, ...points.map((p) => p.x));
-    const yTicks = niceTicks(Math.max(1, ...points.map((p) => p.y)));
+    const xMax = Math.max(1, xMaxHint ?? 0, ...points.map((p) => p.x));
+    const yTicks = niceTicks(Math.max(1, yMaxHint ?? 0, ...points.map((p) => p.y)));
     const yMax = yTicks[yTicks.length - 1] || 1;
     const xs = (x: number) => L + (x / xMax) * (W - L - R);
     const ys = (y: number) => T + (1 - y / yMax) * (H - T - B);
     const path = points.map((p, i) => `${i ? "L" : "M"}${xs(p.x).toFixed(1)},${ys(p.y).toFixed(1)}`).join("");
     const area = points.length ? `${path}L${xs(points[points.length - 1].x)},${ys(0)}L${xs(points[0].x)},${ys(0)}Z` : "";
     return { xs, ys, yTicks, xMax, path, area };
-  }, [points, H]);
+  }, [points, H, xMaxHint, yMaxHint]);
 
   const onMove = (e: React.MouseEvent) => {
     const r = ref.current?.getBoundingClientRect();
@@ -62,8 +74,8 @@ export function LineChart({ points, height = 200, xLabel, format = (v) => v.toLo
           <text key={t} x={xs(t)} y={H - 8} textAnchor={t === 0 ? "start" : t === xMax ? "end" : "middle"}
                 className="chart-axis">{xFormat(Math.round(t))}</text>
         ))}
-        <path d={area} fill={color} opacity={0.1} />
-        <path d={path} fill="none" stroke={color} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round"
+        <path d={area} fill={color} opacity={0.1} className="chart-anim" />
+        <path className="chart-anim" d={path} fill="none" stroke={color} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round"
               vectorEffect="non-scaling-stroke" />
         {hp && (
           <g>
@@ -80,3 +92,5 @@ export function LineChart({ points, height = 200, xLabel, format = (v) => v.toLo
     </div>
   );
 }
+
+export const LineChart = memo(LineChartInner);

@@ -23,3 +23,9 @@ labels:
   public_health_event: an outbreak, health alert or medical emergency
   sports_event: a match, race or competition result
   no_event: no specific real-world event is reported
+
+# Measured speed (docs/BENCHMARKS.md): shown in the UI's info point, used for estimates and the Fast preset.
+profile:
+  speed: fast
+  rows_per_s: 23.7
+  throughput: "≈ 24 articles/s (RTX 3080, 500 articles of 300-1,500 words, task alone)"

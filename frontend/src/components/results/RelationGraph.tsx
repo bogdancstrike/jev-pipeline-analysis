@@ -1,79 +1,132 @@
-import { useMemo, useState } from "react";
+import { memo, useMemo, useState } from "react";
 
 import type { ModuleInfo, Relation } from "../../api/types";
 import { humanize } from "../../lib/format";
 import { entityColor } from "../../lib/labels";
 
-interface Node { id: string; name: string; label: string; x: number; y: number }
+interface Node { id: string; name: string; label: string; x: number; y: number; deg: number }
+
+/** Order nodes so connected ones sit next to each other on the circle: short edges, few crossings. */
+function connectedOrder(ids: string[], edges: [string, string][]): string[] {
+  const adj = new Map(ids.map((i) => [i, new Set<string>()]));
+  for (const [a, b] of edges) { adj.get(a)?.add(b); adj.get(b)?.add(a); }
+  const seen = new Set<string>();
+  const out: string[] = [];
+  const byDegree = [...ids].sort((a, b) => (adj.get(b)!.size - adj.get(a)!.size));
+  for (const start of byDegree) {
+    if (seen.has(start)) continue;
+    const queue = [start];
+    seen.add(start);
+    while (queue.length) {
+      const n = queue.shift()!;
+      out.push(n);
+      for (const m of [...adj.get(n)!].sort((a, b) => adj.get(b)!.size - adj.get(a)!.size)) {
+        if (!seen.has(m)) { seen.add(m); queue.push(m); }
+      }
+    }
+  }
+  return out;
+}
 
 /**
- * Who relates to whom in one row: entities on a circle (stable, never overlapping for a
- * handful of nodes), directed edges labelled with the relation. Hover an entity to isolate
- * its relations. Node colour = entity type, with the legend below so colour is not the only key.
+ * Who relates to whom in one row. Entities on a circle ordered by connection, curved directed
+ * edges. Edge labels show for small graphs; otherwise hover an entity (or an edge) to read its
+ * relations, so labels never pile on top of each other. Colour = entity type (legend below).
  */
-export function RelationGraph({ relations, modules }: { relations: Relation[]; modules: ModuleInfo[] }) {
-  const [focus, setFocus] = useState<string | null>(null);
-  const { nodes, edges, W, H } = useMemo(() => {
-    const byId = new Map<string, { name: string; label: string }>();
+function RelationGraphInner({ relations, modules }: { relations: Relation[]; modules: ModuleInfo[] }) {
+  const [focusNode, setFocusNode] = useState<string | null>(null);
+  const [focusEdge, setFocusEdge] = useState<number | null>(null);
+  const { nodes, edges, W, H, cx, cy } = useMemo(() => {
+    const info = new Map<string, { name: string; label: string }>();
+    const pairs: [string, string][] = [];
     for (const r of relations) {
-      byId.set(r.head_id ?? r.head, { name: r.head, label: r.head_label ?? "entity" });
-      byId.set(r.tail_id ?? r.tail, { name: r.tail, label: r.tail_label ?? "entity" });
+      const a = r.head_id ?? `t:${r.head}`, b = r.tail_id ?? `t:${r.tail}`;
+      info.set(a, { name: r.head, label: r.head_label ?? "other" });
+      info.set(b, { name: r.tail, label: r.tail_label ?? "other" });
+      pairs.push([a, b]);
     }
-    const W = 560, H = Math.max(240, Math.min(420, 120 + byId.size * 24));
-    const cx = W / 2, cy = H / 2, rx = W / 2 - 110, ry = H / 2 - 36;
-    const nodes: Node[] = [...byId.entries()].map(([id, v], i, all) => {
-      const a = (i / all.length) * Math.PI * 2 - Math.PI / 2;
-      return { id, ...v, x: cx + rx * Math.cos(a), y: cy + ry * Math.sin(a) };
+    const order = connectedOrder([...info.keys()], pairs);
+    const W = 640, H = Math.max(260, Math.min(460, 140 + order.length * 22));
+    const cx = W / 2, cy = H / 2, rx = W / 2 - 150, ry = H / 2 - 34;
+    const deg = new Map<string, number>();
+    for (const [a, b] of pairs) { deg.set(a, (deg.get(a) ?? 0) + 1); deg.set(b, (deg.get(b) ?? 0) + 1); }
+    const nodes: Node[] = order.map((id, i) => {
+      const t = (i / order.length) * Math.PI * 2 - Math.PI / 2;
+      return { id, ...info.get(id)!, x: cx + rx * Math.cos(t), y: cy + ry * Math.sin(t), deg: deg.get(id) ?? 1 };
     });
     const at = new Map(nodes.map((n) => [n.id, n]));
-    const edges = relations.map((r, i) => ({ key: i, r, a: at.get(r.head_id ?? r.head)!, b: at.get(r.tail_id ?? r.tail)! }));
-    return { nodes, edges, W, H };
+    const edges = relations.map((r, i) => ({ i, r, a: at.get(pairs[i][0])!, b: at.get(pairs[i][1])! }));
+    return { nodes, edges, W, H, cx, cy };
   }, [relations]);
 
   if (!relations.length) return null;
-  const labels = [...new Set(nodes.map((n) => n.label))];
-  const dim = (ids: string[]) => focus !== null && !ids.includes(focus);
+  const types = [...new Set(nodes.map((n) => n.label))];
+  const showAllLabels = relations.length <= 4;
+  const active = (e: { i: number; a: Node; b: Node }) =>
+    focusEdge === e.i || (focusNode !== null && (e.a.id === focusNode || e.b.id === focusNode));
+  const anyFocus = focusNode !== null || focusEdge !== null;
 
   return (
-    <figure className="relgraph" aria-label="Relation graph">
+    <figure className="relgraph">
       <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${relations.length} relations between ${nodes.length} entities`}>
         <defs>
-          <marker id="rg-arrow" viewBox="0 0 10 10" refX="10" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="var(--text-3)" />
+          <marker id="rg-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="context-stroke" />
           </marker>
         </defs>
-        {edges.map(({ key, r, a, b }) => {
+        {edges.map((e) => {
+          const { a, b } = e;
           if (!a || !b) return null;
-          const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy) || 1;
-          const pad = 14;
-          const x1 = a.x + (dx / len) * pad, y1 = a.y + (dy / len) * pad, x2 = b.x - (dx / len) * pad, y2 = b.y - (dy / len) * pad;
-          const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+          // Quadratic curve bowing towards the centre: parallel edges separate, arrows stay readable.
+          const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+          const qx = mx + (cx - mx) * 0.35, qy = my + (cy - my) * 0.35;
+          const pad = 9;
+          const sa = Math.hypot(qx - a.x, qy - a.y) || 1, sb = Math.hypot(qx - b.x, qy - b.y) || 1;
+          const x1 = a.x + ((qx - a.x) / sa) * pad, y1 = a.y + ((qy - a.y) / sa) * pad;
+          const x2 = b.x + ((qx - b.x) / sb) * pad, y2 = b.y + ((qy - b.y) / sb) * pad;
+          const on = active(e);
+          const lx = 0.25 * x1 + 0.5 * qx + 0.25 * x2, ly = 0.25 * y1 + 0.5 * qy + 0.25 * y2;
+          const d = `M${x1},${y1} Q${qx},${qy} ${x2},${y2}`;
           return (
-            <g key={key} opacity={dim([a.id, b.id]) ? 0.12 : 1}>
-              <line x1={x1} y1={y1} x2={x2} y2={y2} stroke="var(--text-3)" strokeWidth={1.5} markerEnd="url(#rg-arrow)" />
-              <text x={mx} y={my} dy="-0.4em" textAnchor="middle" className="rg-edge-label">
-                {humanize(r.relation)} · {Math.round(r.confidence * 100)}%
-              </text>
+            <g key={e.i} className={`rg-edge${on ? " is-on" : ""}${anyFocus && !on ? " is-dim" : ""}`}
+               onMouseEnter={() => setFocusEdge(e.i)} onMouseLeave={() => setFocusEdge(null)}>
+              <path d={d} className="rg-edge-hit" />
+              <path d={d} className="rg-edge-line" markerEnd="url(#rg-arrow)" />
+              {(showAllLabels || on) && (
+                <text x={lx} y={ly} textAnchor="middle" dy="0.32em" className="rg-edge-label">
+                  {humanize(e.r.relation)} · {Math.round(e.r.confidence * 100)}%
+                </text>
+              )}
             </g>
           );
         })}
         {nodes.map((n) => {
-          const right = n.x >= W / 2;
+          const right = n.x >= cx + 1;
+          const centre = Math.abs(n.x - cx) < 1;
+          const dim = anyFocus && focusNode !== n.id &&
+            !edges.some((e) => active(e) && (e.a.id === n.id || e.b.id === n.id));
           return (
-            <g key={n.id} opacity={dim([n.id]) ? 0.25 : 1} onMouseEnter={() => setFocus(n.id)} onMouseLeave={() => setFocus(null)}
-               onFocus={() => setFocus(n.id)} onBlur={() => setFocus(null)} tabIndex={0} className="rg-node">
-              <circle cx={n.x} cy={n.y} r={14} fill="transparent" />
-              <circle cx={n.x} cy={n.y} r={7} fill={entityColor(n.label, modules)} stroke="var(--surface)" strokeWidth={2} />
-              <text x={n.x + (right ? 12 : -12)} y={n.y} dy="0.32em" textAnchor={right ? "start" : "end"} className="rg-node-label">
-                {n.name.length > 28 ? `${n.name.slice(0, 27)}…` : n.name}
+            <g key={n.id} className={`rg-node${dim ? " is-dim" : ""}`} tabIndex={0}
+               onMouseEnter={() => setFocusNode(n.id)} onMouseLeave={() => setFocusNode(null)}
+               onFocus={() => setFocusNode(n.id)} onBlur={() => setFocusNode(null)}>
+              <circle cx={n.x} cy={n.y} r={16} fill="transparent" />
+              <circle cx={n.x} cy={n.y} r={Math.min(9, 5 + n.deg)} fill={entityColor(n.label, modules)} stroke="var(--bg)" strokeWidth={2} />
+              <text x={centre ? n.x : n.x + (right ? 14 : -14)} y={centre ? n.y - 16 : n.y} dy={centre ? 0 : "0.32em"}
+                    textAnchor={centre ? "middle" : right ? "start" : "end"} className="rg-node-label">
+                {n.name.length > 26 ? `${n.name.slice(0, 25)}…` : n.name}
               </text>
             </g>
           );
         })}
       </svg>
-      <figcaption className="legend">
-        {labels.map((l) => <span key={l} className="legend-item"><span className="swatch swatch-round" style={{ background: entityColor(l, modules) }} />{l}</span>)}
+      <figcaption className="relgraph-foot">
+        <span className="legend">
+          {types.map((l) => <span key={l} className="legend-item"><span className="swatch swatch-round" style={{ background: entityColor(l, modules) }} />{l}</span>)}
+        </span>
+        {!showAllLabels && <span className="muted small">Hover an entity or an arrow to read its relations.</span>}
       </figcaption>
     </figure>
   );
 }
+
+export const RelationGraph = memo(RelationGraphInner);

@@ -47,7 +47,7 @@ engines:
       max_len: 2048                # context per pass (multilingual checkpoint goes up to 8,192)
     batch:                         # many documents, one question set, shared forward passes
       path: /v1/systemone/batch
-      max_states: 32
+      max_states: 16
     concurrency: 4                 # laya-serve answers 503 + retry-after past LAYA_MAX_CONCURRENT
 
   # ---------------------------------------------------------------- Kev (optional)

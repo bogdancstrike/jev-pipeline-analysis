@@ -1,6 +1,6 @@
 /** Mirrors backend `core/api/schemas.py` and the module result shapes in `core/modules.py`. */
 
-export type ModuleKind = "label" | "entities" | "resolved" | "relations" | "cluster";
+export type ModuleKind = "label" | "entities" | "resolved" | "relations" | "cluster" | "record";
 
 export interface ModuleInfo {
   name: string;
@@ -24,7 +24,8 @@ export interface ModuleInfo {
 /** From each module's YAML `profile:` block, filled from docs/BENCHMARKS.md measurements. */
 export interface ModuleProfile {
   speed?: "fast" | "medium" | "slow";
-  throughput?: string;     // e.g. "≈ 95 articles/s alone (RTX 3080, 675-word articles)"
+  rows_per_s?: number;     // measured alone (docs/BENCHMARKS.md); drives estimates and the Fast preset
+  throughput?: string;     // human sentence for the info point
   notes?: string;
 }
 
@@ -54,11 +55,13 @@ export interface EngineStatus {
   prompt_tps?: number | null;
   vram_reserved_mb?: number | null;
   loaded?: string[];
+  degraded?: string | null;   // e.g. a checkpoint fell back to the CPU after a GPU OOM
   modules: string[];
 }
 
 export interface Health {
-  status: "ready" | "loading";
+  status: "ready" | "loading" | "degraded";
+  degraded?: Record<string, string>;
   engines: Record<string, EngineStatus>;
   modules: Record<string, { ready: boolean; engine: string | null }>;
 }

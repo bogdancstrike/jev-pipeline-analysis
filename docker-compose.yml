@@ -131,7 +131,8 @@ services:
     <<: [*gpu, *secrets]
     environment:
       EXTRACTOR_API_KEY_FILE: /run/secrets/extractor_api_key
-      EXTRACTOR_GPU_MEM_FRACTION: "0.5"    # hard cap ~5 GB: ~2 GB bf16 weights + activations
+      EXTRACTOR_GPU_MEM_FRACTION: "0.35"   # hard cap ~3.4 GB: ~2 GB bf16 weights + activations
+      EXTRACTOR_RELEASE_ABOVE_MB: "2500"   # give cached memory back so Laya never runs out
       EXTRACTOR_DTYPE: bfloat16
       EXTRACTOR_LOAD_OPTIONS: ${EXTRACTOR_LOAD_OPTIONS:-{}}
       TRITON_CACHE_DIR: /tmp/triton
@@ -163,7 +164,7 @@ services:
       # Bound one forward pass (states x questions x max_len tokens): laya-serve splits bigger
       # batches. Without it, PyTorch's caching allocator keeps the biggest batch's activations
       # (measured: 6.5 GB) and starves the extractor sharing the card.
-      LAYA_MAX_BATCH_TOKENS: "32768"
+      LAYA_MAX_BATCH_TOKENS: "16384"
       PYTORCH_CUDA_ALLOC_CONF: expandable_segments:True
     networks: [models]
     depends_on: *after-secrets

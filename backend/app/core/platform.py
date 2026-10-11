@@ -116,7 +116,13 @@ class Platform:
         for m in self.registry:
             self._tasks.append(asyncio.create_task(m.start(), name=f"{m.name}-start"))
         self._tasks.append(asyncio.create_task(self.jobs.janitor(), name="janitor"))
+        self._tasks.append(asyncio.create_task(self._watch_engines(), name="engine-watch"))
         self.jobs.on_finish = self._persist_run
+
+    async def _watch_engines(self, every_s: float = 15) -> None:
+        while True:
+            await asyncio.sleep(every_s)
+            await asyncio.gather(*(e.refresh() for e in self.engines.used if e.ready), return_exceptions=True)
 
     async def _persist_run(self, job: Job) -> None:
         try:
@@ -145,7 +151,9 @@ class Platform:
         engines = {e.name: {**e.status(), "modules": [m.name for m in self.registry if m.engine is e]}
                    for e in self.engines.used}
         ready = all(v["ready"] for v in modules.values())
-        return {"status": "ready" if ready else "loading", "engines": engines, "modules": modules}
+        degraded = {n: e["degraded"] for n, e in engines.items() if e.get("degraded")}
+        status = "loading" if not ready else "degraded" if degraded else "ready"
+        return {"status": status, "engines": engines, "modules": modules, "degraded": degraded}
 
     def describe(self) -> dict[str, Any]:
         s = self.settings
@@ -246,7 +254,7 @@ class Platform:
         overall = [(t, min(d.values()) if d else 0) for t, d in pts]
         peak = max(((b[1] - a[1]) / (b[0] - a[0]) for a, b in zip(overall, overall[1:]) if b[0] > a[0]), default=0.0)
         wall = job.elapsed()
-        return {"job": job.snapshot(), "wall_s": round(wall, 2),
+        return {"job": job.snapshot(), "wall_s": round(wall, 4),
                 "rows_per_s": round(job.done / wall, 2) if wall > 0 else None,
                 "peak_rows_per_s": round(peak, 2), "modules": modules,
                 "timeline": [{"t": t, "done": d} for t, d in pts],

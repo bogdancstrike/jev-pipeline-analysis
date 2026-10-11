@@ -79,6 +79,9 @@ class Engine(ABC):
         return {"name": self.name, "kind": self.kind, "ready": self.ready,
                 "description": self.description, **self.info}
 
+    async def refresh(self) -> None:
+        """Re-check runtime state (e.g. a silent CPU fallback). Default: nothing to check."""
+
     @abstractmethod
     async def classify(self, texts: list[str], q: Question, options: dict[str, Any] | None = None
                        ) -> list[Classification | None]: ...

@@ -14,3 +14,9 @@ labels:
   society_desk: health, education, labour, migration, protests
   info_ops_desk: propaganda, disinformation, influence operations
   discard: lifestyle, entertainment, advertising, scams, spam
+
+# Measured speed (docs/BENCHMARKS.md): shown in the UI's info point, used for estimates and the Fast preset.
+profile:
+  speed: fast
+  rows_per_s: 26.6
+  throughput: "≈ 27 articles/s (RTX 3080, 500 articles of 300-1,500 words, task alone)"

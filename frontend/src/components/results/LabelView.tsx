@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Progress, Space, Tag, Tooltip, Typography } from "antd";
 
 import type { LabelResult, ModuleInfo } from "../../api/types";
@@ -8,7 +9,7 @@ const TONE_TAG: Record<Tone, string | undefined> = {
   danger: "error", warning: "warning", success: "success", neutral: undefined,
 };
 
-export function LabelTag({ module, label, review, compact }: { module: ModuleInfo; label: string; review?: boolean; compact?: boolean }) {
+function LabelTagInner({ module, label, review, compact }: { module: ModuleInfo; label: string; review?: boolean; compact?: boolean }) {
   const tone = labelTone(module.name, label);
   const color = tone ? TONE_TAG[tone] : labelColor(label, labelOrder(module));
   return (
@@ -22,7 +23,7 @@ export function LabelTag({ module, label, review, compact }: { module: ModuleInf
 }
 
 /** Table cell: label, confidence, and an amber mark when the model was unsure. */
-export function LabelCell({ value, module }: { value: unknown; module: ModuleInfo }) {
+function LabelCellInner({ value, module }: { value: unknown; module: ModuleInfo }) {
   const r = value as LabelResult | null;
   if (!r) return <span className="muted">–</span>;
   const unsure = module.review_below !== undefined && r.confidence < module.review_below;
@@ -37,7 +38,7 @@ export function LabelCell({ value, module }: { value: unknown; module: ModuleInf
 }
 
 /** Drawer: the label, the alternatives the model weighed, and module-specific extras. */
-export function LabelDetail({ value, module }: { value: unknown; module: ModuleInfo }) {
+function LabelDetailInner({ value, module }: { value: unknown; module: ModuleInfo }) {
   const r = value as LabelResult | null;
   if (!r) return <span className="muted">No result (empty text).</span>;
   return (
@@ -70,3 +71,9 @@ export function LabelDetail({ value, module }: { value: unknown; module: ModuleI
     </Space>
   );
 }
+
+export const LabelCell = memo(LabelCellInner);
+
+export const LabelDetail = memo(LabelDetailInner);
+
+export const LabelTag = memo(LabelTagInner);

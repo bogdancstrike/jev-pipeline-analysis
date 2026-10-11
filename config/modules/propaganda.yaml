@@ -25,3 +25,9 @@ labels:
   whataboutism_strawman_red_herring: deflects, distorts the opponent's position or changes the subject
   bandwagon_reductio_ad_hitlerum: everyone does it, or the opponent is like a hated group
   none: no propaganda technique, neutral or factual text
+
+# Measured speed (docs/BENCHMARKS.md): shown in the UI's info point, used for estimates and the Fast preset.
+profile:
+  speed: fast
+  rows_per_s: 24.3
+  throughput: "≈ 24 articles/s (RTX 3080, 500 articles of 300-1,500 words, task alone)"

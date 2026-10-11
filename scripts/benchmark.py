@@ -16,18 +16,30 @@ import json
 import subprocess
 import threading
 import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def api(base: str, path: str, body: dict | None = None) -> dict:
-    req = urllib.request.Request(base + path, method="POST" if body is not None else "GET",
-                                 data=json.dumps(body).encode() if body is not None else None,
-                                 headers={"content-type": "application/json"})
-    with urllib.request.urlopen(req, timeout=60) as r:
-        return json.load(r)
+def api(base: str, path: str, body: dict | None = None, retry_s: float = 120) -> dict:
+    """GET/POST JSON. Connection errors (a proxy restart mid-benchmark) are retried for
+    `retry_s`; HTTP errors are not (they are answers)."""
+    deadline = time.time() + retry_s
+    while True:
+        req = urllib.request.Request(base + path, method="POST" if body is not None else "GET",
+                                     data=json.dumps(body).encode() if body is not None else None,
+                                     headers={"content-type": "application/json"})
+        try:
+            with urllib.request.urlopen(req, timeout=60) as r:
+                return json.load(r)
+        except urllib.error.HTTPError:
+            raise
+        except (urllib.error.URLError, ConnectionError, TimeoutError):
+            if time.time() > deadline:
+                raise
+            time.sleep(2)
 
 
 class GpuSampler(threading.Thread):
@@ -77,12 +89,14 @@ def main() -> None:
     ap.add_argument("--sample", default="sample-500.csv")
     ap.add_argument("--modules", default="", help="comma list, or 'all'")
     ap.add_argument("--each", action="store_true", help="one scenario per module (with its dependencies)")
+    ap.add_argument("--from", dest="start", default="", help="with --each: resume at this module")
     ap.add_argument("--label", default="")
     a = ap.parse_args()
 
     catalog = [m["name"] for m in api(a.base, "/api/config")["modules"]]
     if a.each:
-        scenarios = [[m] for m in catalog]
+        names = catalog[catalog.index(a.start):] if a.start else catalog
+        scenarios = [[m] for m in names]
     elif a.modules == "all":
         scenarios = [catalog]
     else:

@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { CheckCircleFilled, CloseCircleFilled } from "@ant-design/icons";
 import { Tooltip } from "antd";
 
@@ -7,7 +8,7 @@ export interface Outcome { key: string; label: string; ok: number; failed: numbe
  * Success / failed / pending per module as one stacked bar each. Status colours are reserved
  * for this meaning and always ship with an icon + count, never colour alone.
  */
-export function OutcomeBars({ rows }: { rows: Outcome[] }) {
+function OutcomeBarsInner({ rows }: { rows: Outcome[] }) {
   return (
     <div className="outcomes">
       <div className="legend">
@@ -36,3 +37,5 @@ export function OutcomeBars({ rows }: { rows: Outcome[] }) {
     </div>
   );
 }
+
+export const OutcomeBars = memo(OutcomeBarsInner);

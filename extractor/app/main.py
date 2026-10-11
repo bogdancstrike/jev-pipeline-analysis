@@ -41,7 +41,10 @@ def _secret(name: str) -> str:
 
 API_KEY = _secret("EXTRACTOR_API_KEY")
 MODELS: dict[str, str] = json.loads(os.environ["EXTRACTOR_MODELS"])
-GPU_FRACTION = float(os.environ.get("EXTRACTOR_GPU_MEM_FRACTION", "0.5"))
+GPU_FRACTION = float(os.environ.get("EXTRACTOR_GPU_MEM_FRACTION", "0.35"))
+# Above this much reserved-but-idle memory, hand the cache back after a request: the card is
+# shared with Laya, which falls back to the CPU (30x slower) when it cannot allocate.
+RELEASE_ABOVE_MB = int(os.environ.get("EXTRACTOR_RELEASE_ABOVE_MB", "2500"))
 # bf16 halves weight memory (three checkpoints fit in ~2 GB) at no measurable cost for encoders
 # on Ampere+. float32 on CPU, where bf16 matmuls are slow.
 DTYPE = os.environ.get("EXTRACTOR_DTYPE", "bfloat16")
@@ -205,6 +208,9 @@ async def extract(req: ExtractRequest):
             results = await asyncio.to_thread(_predict, req)
         except (ValueError, TypeError, KeyError) as e:  # a malformed spec, not a server fault
             raise HTTPException(422, f"invalid {req.task} spec: {e}") from e
+        finally:
+            if STATE["device"] == "cuda" and torch.cuda.memory_reserved() / 2**20 > RELEASE_ABOVE_MB:
+                torch.cuda.empty_cache()
     return {"results": results, "latency_ms": round((time.perf_counter() - t0) * 1000, 1)}
 
 
