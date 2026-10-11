@@ -5,10 +5,13 @@ import { EntitiesCell, EntitiesDetail, ResolvedCell, ResolvedDetail } from "./En
 import { LabelCell, LabelDetail } from "./LabelView";
 import { ClusterCell, ClusterDetail, RelationsCell, RelationsDetail } from "./RelationViews";
 import { FieldsCell, FieldsDetail } from "./RecordViews";
+import { IndicatorDetail } from "./IndicatorView";
+import { TemporalDetail } from "./TemporalView";
 
 export interface RenderContext {
   module: ModuleInfo;
   modules: ModuleInfo[];
+  jobId?: string;
   /** Filter the rows table by this module's value (label, entity id, cluster id). */
   onFilter?: (value: string) => void;
   onOpenRow?: (idx: number) => void;
@@ -32,7 +35,7 @@ export const RENDERERS: Record<ModuleKind, Renderer> = {
   },
   entities: {
     cell: (v, c) => <EntitiesCell value={v} modules={c.modules} />,
-    detail: (v, c) => <EntitiesDetail value={v} modules={c.modules} />,
+    detail: (v, c) => c.module.name === "ioc" ? <IndicatorDetail value={v} /> : <EntitiesDetail value={v} modules={c.modules} />,
   },
   resolved: {
     cell: (v, c) => <ResolvedCell value={v} modules={c.modules} />,
@@ -44,11 +47,11 @@ export const RENDERERS: Record<ModuleKind, Renderer> = {
   },
   record: {
     cell: (v) => <FieldsCell value={v} />,
-    detail: (v) => <FieldsDetail value={v} />,
+    detail: (v, c) => c.module.name === "temporal" ? <TemporalDetail value={v} /> : <FieldsDetail value={v} />,
   },
   cluster: {
     cell: (v) => <ClusterCell value={v} />,
-    detail: (v, c) => <ClusterDetail value={v} onOpenRow={c.onOpenRow} />,
+    detail: (v, c) => <ClusterDetail value={v} jobId={c.jobId} onOpenRow={c.onOpenRow} onFilter={c.onFilter} />,
   },
 };
 

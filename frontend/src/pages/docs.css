@@ -6,7 +6,7 @@
 @source '../../node_modules/fumadocs-ui/dist/**/*.js';
 
 .api-docs { --color-fd-background: var(--bg); --color-fd-foreground: var(--text); --color-fd-card: var(--surface); --color-fd-card-foreground: var(--text); --color-fd-muted: var(--surface-2); --color-fd-muted-foreground: var(--text-3); --color-fd-border: var(--border); --color-fd-primary: var(--accent); --color-fd-primary-foreground: white; --color-fd-secondary: var(--surface-2); --color-fd-secondary-foreground: var(--text); }
-.docs-layout { display: grid; grid-template-columns: minmax(0, 900px) 200px; gap: 40px; align-items: start; }
+.docs-layout { display: grid; grid-template-columns: minmax(0, 1fr) 200px; width: 100%; gap: 40px; align-items: start; }
 .docs-content { min-width: 0; font-size: 14px; line-height: 1.75; }
 .docs-content section { scroll-margin-top: 24px; margin-bottom: 36px; }
 .docs-content h3 { font-size: 21px; margin: 0 0 14px; letter-spacing: -.4px; }

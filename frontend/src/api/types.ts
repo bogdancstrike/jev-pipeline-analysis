@@ -14,6 +14,7 @@ export interface ModuleInfo {
   engine_kind: "systemone" | "gliner2" | "local";
   default_on: boolean;
   labels?: Record<string, string>;
+  label_names?: Record<string, string>;
   review_below?: number;
   records?: Record<string, string[]>;
   dependents?: string[];
@@ -95,6 +96,9 @@ export interface LabelResult {
   score?: number;          // sentiment, toxicity
   toxic?: boolean;         // toxicity
   techniques?: string[];   // propaganda
+  path?: { id: string; name: string; definition: string; confidence: number }[];
+  definition?: string;
+  stop_reason?: string;
 }
 
 export interface Span { start: number; end: number; text: string; label: string; score: number; source?: string; validation?: string }

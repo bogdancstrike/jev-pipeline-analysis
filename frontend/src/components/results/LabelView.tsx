@@ -56,8 +56,10 @@ function LabelDetailInner({ value, module }: { value: unknown; module: ModuleInf
           {r.techniques.map((t) => <LabelTag key={t} module={module} label={t} />)}
         </Space>
       )}
+      {r.path && <div className="iptc-path"><strong className="small">Subject path</strong>{r.path.map((node) => <div key={node.id}><span>{node.name}</span><span className="muted small">{node.id} · {pct(node.confidence)}</span></div>)}<p className="muted small">{r.definition}</p><p className="muted small">Confidence uses the lowest score along the path. {r.stop_reason === "broader_topic" ? "A broader topic was retained because no child was clearly supported." : r.stop_reason === "low_confidence" ? "Stopped before an uncertain finer topic; review suggested." : ""}</p></div>}
       {r.top && r.top.length > 1 && (
         <div className="prob-list">
+          {r.path && <strong className="small">Top-level alternatives</strong>}
           {r.top.map(([label, p]) => (
             <div key={label} className="prob-row">
               <span className="prob-label">{labelText(module, label)}</span>

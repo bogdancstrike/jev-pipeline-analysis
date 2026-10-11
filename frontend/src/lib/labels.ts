@@ -49,5 +49,5 @@ export const entityColor = (label: string, modules: ModuleInfo[]) =>
  */
 export function labelText(module: ModuleInfo, key: string, compact = false): string {
   if (module.name === "language") return compact ? key.toUpperCase() : (module.labels?.[key] || key.toUpperCase());
-  return humanize(key);
+  return module.label_names?.[key] ?? humanize(key);
 }

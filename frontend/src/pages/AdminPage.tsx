@@ -8,19 +8,17 @@ import { api } from "../api/endpoints";
 import type { AdminModule } from "../api/types";
 import { ErrorAlert } from "../components/common/ErrorAlert";
 import { ModelGuide } from "../components/admin/ModelGuide";
+import { IptcTaxonomy } from "../components/admin/IptcTaxonomy";
 import { PageHeader } from "../components/ui/PageHeader";
 import { keys } from "../hooks/queries";
 import { ago, humanize, plural } from "../lib/format";
+import { GROUPS } from "../lib/modules";
 
 type Cfg = Record<string, unknown>;
 interface LabelRow { key: string; description: string; uid: number }
 const NUMERIC = ["review_below", "threshold", "min_confidence", "max_pairs", "max_relations", "batch_size", "concurrency",
-  "min_probability", "same_event_threshold", "max_entity_rows", "top_k", "max_chars", "context_chars", "max_mentions"];
-const TASK_GROUPS = [
-  { title: "Classification & routing", names: ["language", "category", "genre", "relevance", "routing"] },
-  { title: "Entities & events", names: ["ner", "ioc", "entity_resolution", "relations", "fields", "event", "event_coreference", "temporal"] },
-  { title: "Tone & risk", names: ["sentiment", "emotion", "intent", "risk", "toxicity", "propaganda", "extremism"] },
-];
+  "min_probability", "same_event_threshold", "max_entity_rows", "top_k", "max_chars", "context_chars", "max_mentions", "child_min_confidence", "max_depth"];
+const TASK_GROUPS = GROUPS.map((group) => ({ title: group.title, names: group.modules }));
 
 function toRows(labels: unknown): LabelRow[] {
   if (Array.isArray(labels)) return labels.map((k, uid) => ({ key: String(k), description: "", uid }));
@@ -160,6 +158,7 @@ function Editor({ m, onDirtyChange }: { m: AdminModule; onDirtyChange: (dirty: b
       <Tabs activeKey={tab} onChange={(next) => { if (next === "advanced" && !jsonError) setJson(JSON.stringify(config, null, 2)); setTab(next); }} items={[
         { key: "settings", label: "Settings", icon: <SettingOutlined />, children: settings },
         ...(labelKey ? [{ key: "options", label: `Options (${optionCount})`, icon: <TagsOutlined />, children: options }] : []),
+        ...(m.name === "iptc" ? [{ key: "taxonomy", label: "IPTC taxonomy", icon: <TagsOutlined />, children: <IptcTaxonomy /> }] : []),
         { key: "advanced", label: "Advanced", icon: <CodeOutlined />, children: advanced },
         { key: "history", label: "History", icon: <HistoryOutlined />, children: changes },
       ]} />

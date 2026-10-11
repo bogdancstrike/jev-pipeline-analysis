@@ -37,10 +37,10 @@ export function requiredBy(selected: string[], name: string, modules: ModuleInfo
 
 /** Presentation groups for the picker. Unknown modules land in "More", so new ones still show. */
 export const GROUPS: { title: string; modules: string[] }[] = [
-  { title: "Basics", modules: ["language", "category"] },
-  { title: "Entities", modules: ["ner", "entity_resolution", "relations"] },
-  { title: "Events", modules: ["event", "event_coreference"] },
-  { title: "Tone & risk", modules: ["sentiment", "intent", "toxicity", "propaganda"] },
+  { title: "Classification & routing", modules: ["language", "category", "iptc", "genre", "relevance", "routing"] },
+  { title: "Entities & indicators", modules: ["ner", "entity_resolution", "relations", "ioc", "fields"] },
+  { title: "Events & dates", modules: ["event", "event_coreference", "temporal"] },
+  { title: "Tone & risk", modules: ["sentiment", "emotion", "intent", "risk", "toxicity", "propaganda", "extremism"] },
 ];
 
 export function groupModules(modules: ModuleInfo[]): { title: string; items: ModuleInfo[] }[] {

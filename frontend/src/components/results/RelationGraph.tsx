@@ -3,6 +3,7 @@ import { memo, useMemo, useState } from "react";
 import type { ModuleInfo, Relation } from "../../api/types";
 import { humanize } from "../../lib/format";
 import { entityColor } from "../../lib/labels";
+import { useEvidence } from "./EvidenceView";
 
 interface Node { id: string; name: string; label: string; x: number; y: number; deg: number }
 
@@ -34,6 +35,7 @@ function connectedOrder(ids: string[], edges: [string, string][]): string[] {
  * relations, so labels never pile on top of each other. Colour = entity type (legend below).
  */
 function RelationGraphInner({ relations, modules }: { relations: Relation[]; modules: ModuleInfo[] }) {
+  const showEvidence = useEvidence();
   const [focusNode, setFocusNode] = useState<string | null>(null);
   const [focusEdge, setFocusEdge] = useState<number | null>(null);
   const { nodes, edges, W, H, cx, cy } = useMemo(() => {
@@ -89,6 +91,10 @@ function RelationGraphInner({ relations, modules }: { relations: Relation[]; mod
           const d = `M${x1},${y1} Q${qx},${qy} ${x2},${y2}`;
           return (
             <g key={e.i} className={`rg-edge${on ? " is-on" : ""}${anyFocus && !on ? " is-dim" : ""}`}
+               tabIndex={0} role="button" aria-label={`Highlight ${e.r.head} ${humanize(e.r.relation)} ${e.r.tail}`}
+               onClick={() => showEvidence(`${e.r.head} → ${e.r.tail}`, [e.r.evidence ?? "", e.r.head, e.r.tail])}
+               onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); showEvidence(`${e.r.head} → ${e.r.tail}`, [e.r.evidence ?? "", e.r.head, e.r.tail]); } }}
+               onFocus={() => setFocusEdge(e.i)} onBlur={() => setFocusEdge(null)}
                onMouseEnter={() => setFocusEdge(e.i)} onMouseLeave={() => setFocusEdge(null)}>
               <path d={d} className="rg-edge-hit" />
               <path d={d} className="rg-edge-line" markerEnd="url(#rg-arrow)" />
@@ -106,7 +112,9 @@ function RelationGraphInner({ relations, modules }: { relations: Relation[]; mod
           const dim = anyFocus && focusNode !== n.id &&
             !edges.some((e) => active(e) && (e.a.id === n.id || e.b.id === n.id));
           return (
-            <g key={n.id} className={`rg-node${dim ? " is-dim" : ""}`} tabIndex={0}
+            <g key={n.id} className={`rg-node${dim ? " is-dim" : ""}`} tabIndex={0} role="button" aria-label={`Highlight ${n.name}`}
+               onClick={() => showEvidence(n.name, [n.name])}
+               onKeyDown={(event) => { if (event.key === "Enter" || event.key === " ") { event.preventDefault(); showEvidence(n.name, [n.name]); } }}
                onMouseEnter={() => setFocusNode(n.id)} onMouseLeave={() => setFocusNode(null)}
                onFocus={() => setFocusNode(n.id)} onBlur={() => setFocusNode(null)}>
               <circle cx={n.x} cy={n.y} r={16} fill="transparent" />
