@@ -141,9 +141,16 @@ class SystemOneEngine(Engine):
         attempt = 0
         while True:
             client = self._clients[next(self._rr)]
+            items = len(payload.get("states") or [0])
             try:
                 async with self._sem:
-                    r = await client.post(path, json=payload)
+                    t0 = self.metrics.begin()
+                    try:
+                        r = await client.post(path, json=payload)
+                    except BaseException:
+                        self.metrics.end(t0, ok=False)
+                        raise
+                    self.metrics.end(t0, ok=r.status_code == 200, items=items)
             except httpx.TransportError as e:
                 r, err = None, e
             else:
@@ -159,6 +166,7 @@ class SystemOneEngine(Engine):
                 if not retryable:
                     raise EngineError(f"engine {self.name}: {r.status_code} {r.text[:300]}")
             attempt += 1
+            self.metrics.retries += 1
             if attempt > self.max_retries:
                 raise EngineError(f"engine {self.name}: giving up after {attempt} attempts: {err or r.status_code}")
             await asyncio.sleep(self._backoff(r, attempt))

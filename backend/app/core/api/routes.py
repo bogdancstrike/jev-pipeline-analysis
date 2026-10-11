@@ -148,6 +148,18 @@ async def job_summary(job: JobDep, platform: PlatformDep) -> dict[str, Any]:
     return platform.summary(job)
 
 
+@router.get("/jobs/{job_id}/metrics", tags=["jobs"])
+async def job_metrics(job: JobDep, platform: PlatformDep) -> dict[str, Any]:
+    """Timings for the dashboard: per-module windows, latencies, throughput timeline, engines."""
+    return platform.job_metrics(job)
+
+
+@router.get("/engines/metrics", tags=["system"])
+async def engine_metrics(platform: PlatformDep) -> dict[str, Any]:
+    """Per-engine request counts, errors, retries, in-flight and latency since start."""
+    return platform.engine_metrics()
+
+
 @router.get("/jobs/{job_id}/rows", response_model=RowPage, tags=["jobs"])
 async def job_rows(job: JobDep, platform: PlatformDep,
                    offset: int = Query(0, ge=0), limit: int = Query(50, ge=1, le=500),

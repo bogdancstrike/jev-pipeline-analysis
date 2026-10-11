@@ -59,13 +59,20 @@ class Gliner2Engine(Engine):
         for attempt in range(6):
             try:
                 async with self._sem:
-                    r = await self._c.post("/v1/extract", json=body)
+                    t0 = self.metrics.begin()
+                    try:
+                        r = await self._c.post("/v1/extract", json=body)
+                    except BaseException:
+                        self.metrics.end(t0, ok=False)
+                        raise
+                    self.metrics.end(t0, ok=r.status_code == 200, items=len(body["texts"]))
                 if r.status_code == 200:
                     return r.json()["results"]
                 if r.status_code < 500 and r.status_code != 429:
                     raise EngineError(f"engine {self.name}: {r.status_code} {r.text[:300]}")
             except httpx.TransportError:
                 pass
+            self.metrics.retries += 1
             await asyncio.sleep(0.5 * 2**attempt)
         raise EngineError(f"engine {self.name}: unavailable")
 

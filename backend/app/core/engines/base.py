@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 from ..config import Settings
+from ..metrics import CallMetrics
 
 
 class EngineError(RuntimeError):
@@ -65,6 +66,7 @@ class Engine(ABC):
         self.name, self.cfg, self.settings = name, cfg, settings
         self.ready = False
         self.info: dict[str, Any] = {}
+        self.metrics = CallMetrics()
         self.description = str(cfg.get("description", ""))
 
     @abstractmethod

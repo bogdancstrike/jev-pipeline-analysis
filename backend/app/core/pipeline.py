@@ -20,6 +20,7 @@ from typing import Any
 import pandas as pd
 
 from .config import Settings
+from .metrics import ModuleMetrics, Timeline
 from .modules import Module, Scope
 
 log = logging.getLogger("pipeline")
@@ -59,6 +60,9 @@ class Job:
     errors: dict[str, dict[int, str]] = field(default_factory=dict)
     progress: dict[str, ModuleProgress] = field(default_factory=dict)
     state: dict[str, Any] = field(default_factory=dict)  # per-module scratch space for this job
+    metrics: dict[str, ModuleMetrics] = field(default_factory=dict)
+    job_scoped: set[str] = field(default_factory=set)   # modules that finish all rows at once, at the end
+    timeline: Timeline = field(default_factory=Timeline)
     version: int = 0                                      # bumped on every change; drives SSE
 
     def __post_init__(self) -> None:
@@ -69,6 +73,7 @@ class Job:
             self.results.setdefault(name, [None] * self.total)
             self.errors.setdefault(name, {})
             self.progress.setdefault(name, ModuleProgress())
+            self.metrics.setdefault(name, ModuleMetrics())
 
     @property
     def total(self) -> int:
@@ -76,8 +81,10 @@ class Job:
 
     @property
     def done(self) -> int:
-        """Rows every module has finished with."""
-        return min((p.done for p in self.progress.values()), default=0)
+        """Records every row-level module has finished. Job-level modules (coreference) report
+        all rows at once at the very end, so counting them would pin this at 0 all run long."""
+        rows = [p.done for k, p in self.progress.items() if k not in self.job_scoped]
+        return min(rows or [p.done for p in self.progress.values()] or [0])
 
     def result(self, module: str, i: int) -> Any:
         return self.results[module][i] if module in self.results else None
@@ -102,8 +109,10 @@ class Job:
         elapsed = self.elapsed()
         work_total = self.total * max(1, len(self.progress))
         work_done = sum(p.done for p in self.progress.values())
-        rate = self.done / elapsed if elapsed > 0 else 0.0
         work_rate = work_done / elapsed if elapsed > 0 else 0.0
+        # Records/s = average module progress per second: moves from the first finished batch,
+        # unlike done/elapsed, which waits for the slowest module to finish its first row.
+        rate = work_rate / max(1, len(self.progress))
         running = self.status == JobStatus.RUNNING
         return {
             "id": self.id, "filename": self.filename, "status": str(self.status), "error": self.error,
@@ -171,6 +180,7 @@ class JobRunner:
                     q.put_nowait(None)  # leave the stop signal for the next get
                     break
                 batch.append(nxt)
+            t0 = time.time()
             try:
                 results = await m.process_rows(self.job, batch)
                 if len(results) != len(batch):
@@ -183,11 +193,13 @@ class JobRunner:
             else:
                 for i, r in zip(batch, results):
                     self.job.results[m.name][i] = r
+            self.job.metrics[m.name].observe(len(batch), t0, time.time())
             await self._rows_done(m, batch)
 
     async def _run_job_scope(self, m: Module) -> None:
         await asyncio.gather(*(self.complete[r].wait() for r in m.requires))
         rows = list(range(self.job.total))
+        t0 = time.time()
         try:
             results = await m.process_job(self.job)
             self.job.results[m.name] = list(results)
@@ -196,6 +208,7 @@ class JobRunner:
         except Exception as e:  # noqa: BLE001
             log.exception("job %s: %s failed", self.job.id, m.name)
             self._fail(m, rows, e)
+        self.job.metrics[m.name].observe(len(rows), t0, time.time())
         await self._rows_done(m, rows)
 
     def _fail(self, m: Module, rows: list[int], e: Exception) -> None:
@@ -234,7 +247,8 @@ class JobManager:
 
     def submit(self, filename: str, df: pd.DataFrame, modules: list[Module]) -> Job:
         job = Job(id=uuid.uuid4().hex, filename=filename, df=df, modules=[m.name for m in modules],
-                  max_text_chars=self.s.max_text_chars)
+                  max_text_chars=self.s.max_text_chars,
+                  job_scoped={m.name for m in modules if m.scope == Scope.JOB})
         self.jobs[job.id] = job
         task = asyncio.create_task(self._run(job, modules), name=f"job-{job.id}")
         self._tasks[job.id] = task
@@ -263,7 +277,12 @@ class JobManager:
             async with self._slots:
                 job.status, job.started_at = JobStatus.RUNNING, time.time()
                 job.touch()
-                await JobRunner(job, modules).run()
+                sampler = asyncio.create_task(self._sample(job))
+                try:
+                    await JobRunner(job, modules).run()
+                finally:
+                    sampler.cancel()
+                    self._sample_once(job)
                 job.status = JobStatus.DONE
         except asyncio.CancelledError:
             job.status = JobStatus.CANCELLED
@@ -275,6 +294,17 @@ class JobManager:
             job.finished_at = time.time()
             job.started_at = job.started_at or job.finished_at
             job.touch()
+
+    @staticmethod
+    def _sample_once(job: Job) -> None:
+        if job.started_at:
+            job.timeline.sample(time.time() - job.started_at, {k: p.done for k, p in job.progress.items()})
+
+    async def _sample(self, job: Job, every_s: float = 1.0) -> None:
+        """Throughput timeline for the dashboard: rows done per module, once a second."""
+        while True:
+            self._sample_once(job)
+            await asyncio.sleep(every_s)
 
     async def janitor(self, every_s: float = 300) -> None:
         while True:

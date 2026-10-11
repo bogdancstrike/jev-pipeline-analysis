@@ -1,6 +1,8 @@
 # torch from PyPI on x86_64 Linux ships CUDA 12.8 kernels (sm_86 / RTX 3080 included).
 torch==2.8.0
-gliner2[local]==2.1.0
+# disentangled-flash: fused Triton kernels for DeBERTa's disentangled attention (+ packed,
+# padding-free batches). Selected at load time by EXTRACTOR_LOAD_OPTIONS.
+gliner2[local,disentangled-flash]==2.1.0
 # The multilingual checkpoints sit on mDeBERTa-v3: its SentencePiece tokenizer is converted to
 # a fast tokenizer at load time, which needs both of these (gliner2 does not declare them).
 sentencepiece==0.2.1

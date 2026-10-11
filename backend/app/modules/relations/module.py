@@ -103,7 +103,9 @@ class RelationsModule(Module):
 
     # ---------------------------------------------------------------- gliner2 strategy
     async def _extract_rows(self, job, idxs: list[int]) -> list[Any]:
-        spec = {k: (v or k.replace("_", " ")) for k, v in self.labels.items() if k != self.none_label}
+        # Plain type names: GLiNER2's relation head scores descriptions poorly (measured: a
+        # described spec lost most relations at the same threshold). Descriptions are for the UI.
+        spec = [k for k in self.labels if k != self.none_label]
         live = [i for i in idxs if job.texts[i].strip()]
         found = dict(zip(live, await self.engine.extract("relations", [job.texts[i] for i in live], spec,
                                                          self.engine_options))) if live else {}

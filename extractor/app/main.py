@@ -41,10 +41,13 @@ def _secret(name: str) -> str:
 
 API_KEY = _secret("EXTRACTOR_API_KEY")
 MODELS: dict[str, str] = json.loads(os.environ["EXTRACTOR_MODELS"])
-GPU_FRACTION = float(os.environ.get("EXTRACTOR_GPU_MEM_FRACTION", "0.35"))
+GPU_FRACTION = float(os.environ.get("EXTRACTOR_GPU_MEM_FRACTION", "0.5"))
 # bf16 halves weight memory (three checkpoints fit in ~2 GB) at no measurable cost for encoders
 # on Ampere+. float32 on CPU, where bf16 matmuls are slow.
 DTYPE = os.environ.get("EXTRACTOR_DTYPE", "bfloat16")
+# gliner2 load options, e.g. {"attention_backend": "disentangled_flash", "disentangled_flash_packed": true}
+# or {"compile": true}. Measured choices are documented in docs/BENCHMARKS.md.
+LOAD_OPTIONS: dict[str, Any] = json.loads(os.environ.get("EXTRACTOR_LOAD_OPTIONS", "{}"))
 MAX_TEXTS = 128
 MAX_CHARS = 100_000
 STATE: dict[str, Any] = {}
@@ -60,9 +63,15 @@ async def lifespan(app: FastAPI):
         torch.backends.cuda.matmul.allow_tf32 = True
     models = {}
     for alias, repo in MODELS.items():
-        m = AutoExtractor.from_pretrained(repo)
         dtype = getattr(torch, DTYPE) if device == "cuda" else torch.float32
-        models[alias] = m.to(device=device, dtype=dtype).eval()
+        if device == "cuda" and LOAD_OPTIONS:
+            # Attention backends (disentangled_flash) bind to the device they are enabled on:
+            # load straight onto the GPU, and only cast dtype afterwards.
+            m = AutoExtractor.from_pretrained(repo, map_location=device, **LOAD_OPTIONS)
+            models[alias] = m.to(dtype=dtype).eval()
+        else:
+            m = AutoExtractor.from_pretrained(repo)
+            models[alias] = m.to(device=device, dtype=dtype).eval()
         log.info("loaded %s = %s", alias, repo)
     lid = LanguageIdentifier.from_pickled_model(MODEL_FILE, norm_probs=True)
     STATE.update(models=models, device=device, lock=asyncio.Lock(), lid=lid)
@@ -151,12 +160,37 @@ def _run(req: ExtractRequest, model, texts: list[str]) -> list[Any]:
     return model.batch_extract_json_long(texts, req.spec, **kw)
 
 
+def _run_adaptive(req: ExtractRequest, alias: str, texts: list[str]) -> list[Any]:
+    """Run, and on CUDA OOM free the cache and retry with half the batch (down to 1).
+
+    Long documents make activation memory vary a lot, so the batch size self-tunes to what
+    fits. The size that worked becomes a sticky cap for this (model, task): an OOM costs a
+    wasted forward pass, so it must happen once, not on every request.
+    """
+    caps = STATE.setdefault("bs_cap", {})
+    key = (alias, req.task)
+    bs = min(req.batch_size, caps.get(key, req.batch_size))
+    while True:
+        try:
+            out = _run(req.model_copy(update={"batch_size": bs}), STATE["models"][alias], texts)
+            if bs < req.batch_size:
+                caps[key] = bs
+            return out
+        except torch.OutOfMemoryError:
+            torch.cuda.empty_cache()
+            if bs == 1:
+                raise
+            STATE["oom_retries"] = STATE.get("oom_retries", 0) + 1
+            log.warning("CUDA OOM on %s/%s at batch_size=%d; capping at %d", alias, req.task, bs, bs // 2)
+            bs //= 2
+
+
 def _predict(req: ExtractRequest) -> list[Any]:
     texts = [t[:MAX_CHARS] for t in req.texts]
     results: list[Any] = [None] * len(texts)
     with torch.inference_mode():
         for alias, idx in _route(texts, req.model).items():
-            for i, r in zip(idx, _run(req, STATE["models"][alias], [texts[i] for i in idx])):
+            for i, r in zip(idx, _run_adaptive(req, alias, [texts[i] for i in idx])):
                 results[i] = r
     return results
 
@@ -185,8 +219,12 @@ async def readyz():
         raise HTTPException(503, "loading")
     dev = STATE["device"]
     info: dict[str, Any] = {"status": "ready", "engine": "gliner2", "models": MODELS, "device": dev,
+                            "load_options": LOAD_OPTIONS,
                             "dtype": DTYPE if dev == "cuda" else "float32"}
     if dev == "cuda":
         info["gpu"] = torch.cuda.get_device_name(0)
         info["vram_reserved_mb"] = round(torch.cuda.memory_reserved() / 2**20)
+        info["oom_retries"] = STATE.get("oom_retries", 0)
+        info["vram_peak_mb"] = round(torch.cuda.max_memory_allocated() / 2**20)
+        info["batch_caps"] = {f"{a}/{t}": bs for (a, t), bs in STATE.get("bs_cap", {}).items()}
     return info

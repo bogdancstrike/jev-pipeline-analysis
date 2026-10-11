@@ -107,3 +107,17 @@ async def test_cancel_stops_a_running_job():
     assert jm.cancel(job)
     await wait(job)
     assert job.status == JobStatus.CANCELLED and not jm.cancel(job)
+
+
+def test_progress_is_not_pinned_at_zero_by_a_job_level_module():
+    """Regression: '0 rows/s' while running. A job-scope module (coreference) reports all rows
+    at the end; it must not hold 'records done' and throughput at 0 meanwhile."""
+    import time
+
+    from app.core.pipeline import Job, ModuleProgress
+    job = Job(id="j", filename="f.csv", df=pd.DataFrame({"id": ["1", "2"], "text": ["a", "b"]}),
+              modules=["upper", "total"], job_scoped={"total"})
+    job.status, job.started_at = JobStatus.RUNNING, time.time() - 10
+    job.progress = {"upper": ModuleProgress(done=2), "total": ModuleProgress(done=0)}
+    snap = job.snapshot()
+    assert snap["done"] == 2 and snap["rows_per_s"] > 0 and snap["percent"] == 50.0

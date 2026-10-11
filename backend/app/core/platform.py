@@ -161,6 +161,27 @@ class Platform:
                 "review": self.review_flags(job, i),
                 "errors": {n: job.errors[n][i] for n in job.modules if i in job.errors[n]}}
 
+    def job_metrics(self, job: Job) -> dict[str, Any]:
+        import time
+        now = time.time()
+        modules = {}
+        for m in self.modules_of(job):
+            modules[m.name] = {**job.metrics[m.name].snapshot(job.started_at, now),
+                               "engine": m.engine.name if m.engine else None,
+                               "errors": len(job.errors[m.name])}
+        pts = job.timeline.points
+        overall = [(t, min(d.values()) if d else 0) for t, d in pts]
+        peak = max(((b[1] - a[1]) / (b[0] - a[0]) for a, b in zip(overall, overall[1:]) if b[0] > a[0]), default=0.0)
+        wall = job.elapsed()
+        return {"job": job.snapshot(), "wall_s": round(wall, 2),
+                "rows_per_s": round(job.done / wall, 2) if wall > 0 else None,
+                "peak_rows_per_s": round(peak, 2), "modules": modules,
+                "timeline": [{"t": t, "done": d} for t, d in pts],
+                "engines": self.engine_metrics()}
+
+    def engine_metrics(self) -> dict[str, Any]:
+        return {e.name: {"kind": e.kind, "ready": e.ready, **e.metrics.snapshot()} for e in self.engines.used}
+
     def export(self, job: Job) -> bytes:
         cols: dict[str, list[str]] = {}
         for m in self.modules_of(job):
