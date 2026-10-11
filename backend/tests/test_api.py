@@ -117,3 +117,30 @@ async def test_job_from_a_server_side_sample(api):
     assert r.json()["total"] == 50 and r.json()["modules"] == ["language"]
     bad = await api.post("/api/jobs/sample", json={"sample": "../../etc/passwd"})
     assert bad.status_code == 404
+
+
+@pytest.mark.asyncio
+async def test_admin_override_is_validated_applied_and_audited(api):
+    labels = (await api.get("/api/admin/modules/sentiment")).json()["effective"]["labels"]
+    new = {**labels, "sarcastic": "ironic or mocking tone"}
+    r = await api.put("/api/admin/modules/sentiment", json={"config": {"labels": new}, "changed_by": "test"})
+    assert r.status_code == 200, r.text
+    cfg = (await api.get("/api/config")).json()
+    assert "sarcastic" in next(m for m in cfg["modules"] if m["name"] == "sentiment")["labels"]
+    # Invalid: one label is not a classification. Refused, nothing changes.
+    bad = await api.put("/api/admin/modules/sentiment", json={"config": {"labels": {"only": ""}}})
+    assert bad.status_code == 422 and "at least 2 labels" in bad.json()["message"]
+    # A module on an engine of the wrong kind is refused too.
+    bad = await api.put("/api/admin/modules/ner", json={"config": {"engine": "laya"}})
+    assert bad.status_code == 422
+    hist = (await api.get("/api/admin/history", params={"module": "sentiment"})).json()
+    assert hist[0]["changed_by"] == "test" and hist[0]["action"] == "update"
+    r = await api.delete("/api/admin/modules/sentiment")
+    assert r.json()["override"] is None
+
+
+@pytest.mark.asyncio
+async def test_job_from_pasted_text(api):
+    r = await api.post("/api/jobs/text", json={"texts": ["NATO ministers met in Brussels on Thursday."],
+                                               "modules": ["language", "ner"]})
+    assert r.status_code == 202 and r.json()["total"] == 1 and r.json()["filename"] == "pasted text"

@@ -43,7 +43,7 @@ services:
       - -c
       - |
         set -e
-        for n in decision_api_key llm_api_key extractor_api_key laya_api_key kev_api_key; do
+        for n in decision_api_key llm_api_key extractor_api_key laya_api_key kev_api_key postgres_password; do
           f=/run/secrets/$$n
           if [ ! -s "$$f" ]; then
             head -c 32 /dev/urandom | od -An -tx1 | tr -d ' \n' > "$$f"
@@ -186,6 +186,25 @@ services:
     security_opt: ["no-new-privileges:true"]
     restart: unless-stopped
 
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: triage
+      POSTGRES_USER: triage
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+    volumes:
+      - secrets:/run/secrets:ro
+      - pgdata:/var/lib/postgresql/data
+    networks: [data]
+    depends_on: *after-secrets
+    security_opt: ["no-new-privileges:true"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U triage -d triage"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
   backend:
     build: ./backend
     image: decision-csv-poc/backend:latest
@@ -194,13 +213,18 @@ services:
       ENGINES_PATH: /config/engines.yaml # the models: URLs, limits, batching
       MODULES_DIR: /config/modules       # one YAML per module: engine, labels, prompts, thresholds
       SAMPLES_DIR: /samples
+      POSTGRES_HOST: postgres            # settings overrides + run history (password: secret file)
       MAX_UPLOAD_MB: "512"
     volumes:
       - secrets:/run/secrets:ro
       - ./config:/config:ro                   # edit + `docker compose restart backend`
       - ./samples:/samples:ro
-    networks: [models, edge]
-    depends_on: *after-secrets          # models load in the background; the UI shows progress
+    networks: [models, data, edge]
+    depends_on:                         # models load in the background; the UI shows progress
+      secrets-init:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
     read_only: true
     tmpfs: [/tmp]
     cap_drop: [ALL]
@@ -218,8 +242,11 @@ services:
 
 volumes:
   secrets: {}
+  pgdata: {}
 
 networks:
   models:
     internal: true    # no egress for anything that touches model weights or text
+  data:
+    internal: true    # postgres: reachable by the backend only
   edge: {}

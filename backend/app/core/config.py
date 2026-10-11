@@ -16,6 +16,15 @@ class Settings(BaseSettings):
     # module's own YAML (`engine: <name>`). Secrets: files in SECRETS_DIR named in engines.yaml.
     engines_path: str = "/config/engines.yaml"
 
+    # --- Settings store -------------------------------------------------------------------
+    # Admin overrides of module settings + run history. Either a full DATABASE_URL, or the
+    # POSTGRES_* parts with the password read from a secret file. Neither = in memory.
+    database_url: str = ""
+    postgres_host: str = ""
+    postgres_db: str = "triage"
+    postgres_user: str = "triage"
+    postgres_password_file: str = "/run/secrets/postgres_password"
+
     # --- App ------------------------------------------------------------------------------
     modules_dir: str = "/config/modules"     # one <module>.yaml per module
     samples_dir: str = "/samples"           # sample CSVs (+ manifest.json) offered in the UI
@@ -27,6 +36,16 @@ class Settings(BaseSettings):
     csv_formula_escape: bool = True
     cors_origins: str = ""
     log_level: str = "INFO"
+
+
+    @property
+    def store_url(self) -> str:
+        if self.database_url or not self.postgres_host:
+            return self.database_url
+        from pathlib import Path
+        from urllib.parse import quote
+        password = Path(self.postgres_password_file).read_text().strip()
+        return f"postgresql://{quote(self.postgres_user)}:{quote(password)}@{self.postgres_host}:5432/{self.postgres_db}"
 
 
 @lru_cache

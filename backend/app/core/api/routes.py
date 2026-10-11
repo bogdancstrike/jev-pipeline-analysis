@@ -83,6 +83,33 @@ async def create_job(platform: PlatformDep, file: UploadFile,
     return await _submit(platform, file.filename or "upload.csv", bytes(buf), selected)
 
 
+class TextJob(BaseModel):
+    texts: list[str] = Field(min_length=1, max_length=1000, description="one article per item")
+    modules: list[str] = Field(default_factory=list, description="empty = defaults")
+
+
+@router.post("/jobs/text", status_code=202, response_model=JobSnapshot, tags=["jobs"],
+             responses={503: {"model": ErrorBody}})
+async def create_text_job(platform: PlatformDep, body: TextJob):
+    """Start a job on pasted text: no CSV needed to try an article or two."""
+    import pandas as pd
+    texts = [t for t in body.texts if t.strip()]
+    if not texts:
+        raise InvalidInput("paste at least one non-empty text")
+    if any(len(t) > platform.settings.max_text_chars for t in texts):
+        raise InvalidInput(f"a text is longer than {platform.settings.max_text_chars:,} characters")
+    selected = _selected_modules(platform, body.modules)
+    df = pd.DataFrame({"id": [str(i + 1) for i in range(len(texts))], "text": texts})
+    name = "pasted text" if len(texts) == 1 else f"pasted texts ({len(texts)})"
+    return platform.jobs.submit(name, df, selected).snapshot()
+
+
+@router.get("/runs", tags=["jobs"])
+async def runs(platform: PlatformDep, limit: int = Query(100, ge=1, le=1000)) -> list[dict[str, Any]]:
+    """Finished runs with their metrics, from the store (survives restarts)."""
+    return await platform.store.runs(limit)
+
+
 class SampleJob(BaseModel):
     sample: str = Field(description="a file name from GET /api/samples")
     modules: list[str] = Field(default_factory=list, description="empty = defaults")

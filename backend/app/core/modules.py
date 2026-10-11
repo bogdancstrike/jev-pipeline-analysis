@@ -99,7 +99,9 @@ class Module(ABC):
                 "columns": list(self.output_columns),
                 "engine": self.engine.name if self.engine else None,
                 "engine_kind": self.engine.kind if self.engine else "local",
-                "default_on": bool(self.cfg.get("default_on", True))}
+                "default_on": bool(self.cfg.get("default_on", True)),
+                # For the UI's info point: how fast, measured where (see docs/BENCHMARKS.md).
+                "profile": dict(self.cfg.get("profile") or {})}
 
     # ---------------------------------------------------------------- work
     async def process_rows(self, job: Job, idxs: list[int]) -> list[Any]:

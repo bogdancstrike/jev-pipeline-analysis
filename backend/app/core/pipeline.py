@@ -244,6 +244,7 @@ class JobManager:
         self.jobs: dict[str, Job] = {}
         self._slots = asyncio.Semaphore(settings.max_parallel_jobs)
         self._tasks: dict[str, asyncio.Task] = {}
+        self.on_finish = None  # async callback(job), e.g. persist the run
 
     def submit(self, filename: str, df: pd.DataFrame, modules: list[Module]) -> Job:
         job = Job(id=uuid.uuid4().hex, filename=filename, df=df, modules=[m.name for m in modules],
@@ -294,6 +295,8 @@ class JobManager:
             job.finished_at = time.time()
             job.started_at = job.started_at or job.finished_at
             job.touch()
+            if self.on_finish:
+                await self.on_finish(job)
 
     @staticmethod
     def _sample_once(job: Job) -> None:

@@ -17,6 +17,7 @@ from .engines import EngineRegistry, load_engine_config
 from .modules import Module, ModuleContext
 from .pipeline import Job, JobManager
 from .registry import ModuleRegistry
+from .store import MemoryStore, Store, make_store
 
 log = logging.getLogger("platform")
 
@@ -33,35 +34,100 @@ def load_module_config(modules_dir: str, name: str) -> dict[str, Any]:
     return data
 
 
+def effective_config(defaults: dict[str, Any], override: dict[str, Any] | None) -> dict[str, Any]:
+    """YAML defaults with the admin override on top. Top-level keys replace: an edited label
+    list is the new list, not a merge (a merge could never delete a label)."""
+    return {**defaults, **(override or {})}
+
+
 @dataclass
 class Platform:
     settings: Settings
     engines: EngineRegistry
     registry: ModuleRegistry
     jobs: JobManager
+    catalog: list[type[Module]] = field(default_factory=list)
+    store: Store = field(default_factory=MemoryStore)
+    overrides: dict[str, dict[str, Any]] = field(default_factory=dict)
     _tasks: list[asyncio.Task] = field(default_factory=list)
+    _started_engines: set[str] = field(default_factory=set)
 
     @classmethod
-    def build(cls, settings: Settings, catalog: list[type[Module]]) -> "Platform":
+    def build(cls, settings: Settings, catalog: list[type[Module]], store: Store | None = None) -> "Platform":
         engines = EngineRegistry(settings, load_engine_config(settings.engines_path))
+        p = cls(settings, engines, ModuleRegistry([]), JobManager(settings), catalog=list(catalog),
+                store=store or make_store(settings.store_url))
+        p.registry = p._build_registry({})
+        return p
+
+    # ---------------------------------------------------------------- configuration
+    def defaults(self, name: str) -> dict[str, Any]:
+        return load_module_config(self.settings.modules_dir, name)
+
+    def module_class(self, name: str) -> type[Module]:
+        for c in self.catalog:
+            if c.name == name:
+                return c
+        raise KeyError(name)
+
+    def _construct(self, module_cls: type[Module], cfg: dict[str, Any]) -> Module:
+        ctx = ModuleContext(self.settings, cfg, self.engines, logging.getLogger(f"module.{module_cls.name}"))
+        return module_cls(ctx)
+
+    def _build_registry(self, overrides: dict[str, dict[str, Any]]) -> ModuleRegistry:
+        """Every enabled module from YAML + overrides. Raises on any invalid config."""
         modules = []
-        for module_cls in catalog:
-            cfg = load_module_config(settings.modules_dir, module_cls.name)
+        for module_cls in self.catalog:
+            cfg = effective_config(self.defaults(module_cls.name), overrides.get(module_cls.name))
             if not cfg.get("enabled", True):
                 log.info("module %s disabled by config", module_cls.name)
                 continue
-            ctx = ModuleContext(settings, cfg, engines, logging.getLogger(f"module.{module_cls.name}"))
-            modules.append(module_cls(ctx))
-        return cls(settings, engines, ModuleRegistry(modules), JobManager(settings))
+            modules.append(self._construct(module_cls, cfg))
+        return ModuleRegistry(modules)
+
+    async def apply_overrides(self, overrides: dict[str, dict[str, Any]]) -> None:
+        """Validate the whole module graph with these overrides, then swap it in. Running jobs
+        keep the module instances they started with; new jobs get the new ones."""
+        registry = self._build_registry(overrides)  # raises ValueError -> nothing changes
+        self.registry, self.overrides = registry, overrides
+        self._start_new_engines()
+
+    def _start_new_engines(self) -> None:
+        for e in self.engines.used:
+            if e.name not in self._started_engines and any(m.engine is e for m in self.registry):
+                self._started_engines.add(e.name)
+                self._tasks.append(asyncio.create_task(e.wait_ready(), name=f"engine-{e.name}"))
 
     # ---------------------------------------------------------------- lifecycle
     async def start(self) -> None:
         """Readiness waits run in the background: the UI shows models loading."""
-        for e in self.engines.used:  # only engines an enabled module uses
-            self._tasks.append(asyncio.create_task(e.wait_ready(), name=f"engine-{e.name}"))
+        try:
+            await self.store.start()
+            stored = await self.store.overrides()
+            if stored:
+                try:
+                    await self.apply_overrides(stored)
+                    log.info("applied admin overrides for %s", sorted(stored))
+                except ValueError as e:  # a bad stored override must not keep the service down
+                    log.error("ignoring stored overrides, they no longer validate: %s", e)
+        except Exception:  # noqa: BLE001 - the pipeline runs on YAML defaults without a DB
+            log.exception("settings store unavailable; running on YAML defaults")
+        self._start_new_engines()
         for m in self.registry:
             self._tasks.append(asyncio.create_task(m.start(), name=f"{m.name}-start"))
         self._tasks.append(asyncio.create_task(self.jobs.janitor(), name="janitor"))
+        self.jobs.on_finish = self._persist_run
+
+    async def _persist_run(self, job: Job) -> None:
+        try:
+            m = self.job_metrics(job)
+            await self.store.save_run({"id": job.id, "filename": job.filename, "status": str(job.status),
+                                       "total": job.total, "modules": job.modules, "created_at": job.created_at,
+                                       "wall_s": m["wall_s"], "rows_per_s": m["rows_per_s"],
+                                       "metrics": {"modules": m["modules"], "peak_rows_per_s": m["peak_rows_per_s"],
+                                                   "failed_rows": job.snapshot()["failed_rows"]}})
+        except Exception:  # noqa: BLE001 - history is best effort
+            log.exception("could not persist run %s", job.id)
 
     async def stop(self) -> None:
         for t in self._tasks:
@@ -70,6 +136,7 @@ class Platform:
         await self.jobs.aclose()
         await asyncio.gather(*(m.aclose() for m in self.registry), self.engines.aclose(),
                              return_exceptions=True)
+        await self.store.close()
 
     # ---------------------------------------------------------------- facts
     def health(self) -> dict[str, Any]:
@@ -82,7 +149,13 @@ class Platform:
 
     def describe(self) -> dict[str, Any]:
         s = self.settings
-        return {"modules": [m.describe() for m in self.registry],
+        modules = []
+        for m in self.registry:
+            d = m.describe()
+            d["dependents"] = [x.name for x in self.registry if m.name in x.requires]
+            d["shares_engine_with"] = [x.name for x in self.registry if x is not m and m.engine and x.engine is m.engine]
+            modules.append(d)
+        return {"modules": modules,
                 "engines": {e.name: {"kind": e.kind, "description": e.description} for e in self.engines.used},
                 "defaults": self.registry.defaults(),
                 "limits": {"max_upload_mb": s.max_upload_mb, "max_rows": s.max_rows},
