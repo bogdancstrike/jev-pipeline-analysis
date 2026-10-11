@@ -110,6 +110,21 @@ async def runs(platform: PlatformDep, limit: int = Query(100, ge=1, le=1000)) ->
     return await platform.store.runs(limit)
 
 
+class DeleteRuns(BaseModel):
+    ids: list[str] = Field(min_length=1, max_length=1000, description="run IDs to delete")
+
+
+@router.post("/runs/delete", status_code=204, tags=["jobs"])
+async def delete_runs(platform: PlatformDep, body: DeleteRuns):
+    """Stop selected jobs and remove their results and saved history. Safe to retry."""
+    ids = list(dict.fromkeys(body.ids))
+    for run_id in ids:
+        if job := platform.jobs.get(run_id):
+            await platform.jobs.delete(job)
+    await platform.store.delete_runs(ids)
+    return Response(status_code=204)
+
+
 class SampleJob(BaseModel):
     sample: str = Field(description="a file name from GET /api/samples")
     modules: list[str] = Field(default_factory=list, description="empty = defaults")
@@ -146,7 +161,8 @@ async def cancel_job(job: JobDep, platform: PlatformDep):
 
 @router.delete("/jobs/{job_id}", status_code=204, tags=["jobs"])
 async def delete_job(job: JobDep, platform: PlatformDep):
-    platform.jobs.delete(job)
+    await platform.jobs.delete(job)
+    await platform.store.delete_runs([job.id])
     return Response(status_code=204)
 
 

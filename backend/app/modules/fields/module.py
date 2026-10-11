@@ -25,6 +25,7 @@ class FieldsModule(Module):
         self.records: dict[str, list[str]] = {str(k): [str(f) for f in v] for k, v in (self.cfg.get("records") or {}).items()}
         if not self.records:
             raise ValueError("fields: config needs `records`")
+        self.max_chars = int(self.cfg.get("max_chars", 0))  # 0 = whole text
 
     def describe(self) -> dict[str, Any]:
         fields = {rec: [f.split("::")[0] for f in fs] for rec, fs in self.records.items()}
@@ -32,7 +33,8 @@ class FieldsModule(Module):
 
     async def process_rows(self, job, idxs: list[int]) -> list[Any]:
         live = [i for i in idxs if job.texts[i].strip()]
-        found = dict(zip(live, await self.engine.extract("structures", [job.texts[i] for i in live], self.records,
+        cut = (lambda t: t[: self.max_chars]) if self.max_chars else (lambda t: t)
+        found = dict(zip(live, await self.engine.extract("structures", [cut(job.texts[i]) for i in live], self.records,
                                                          self.engine_options))) if live else {}
         return [self._clean(found.get(i)) for i in idxs]
 

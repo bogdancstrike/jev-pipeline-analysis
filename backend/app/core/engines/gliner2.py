@@ -81,7 +81,13 @@ class Gliner2Engine(Engine):
         """A choice as GLiNER2 classification. Labels carry their descriptions (the model reads
         them); the instruction is the task name's prompt. Empty texts get None."""
         idx = [i for i, t in enumerate(texts) if t.strip()]
-        spec = {q.key: {"labels": {k: (v or k.replace("_", " ")) for k, v in q.criteria.items()}}}
+        # Measured on gold labels (docs/BENCHMARKS.md): GLiNER2.5-Decide is faster AND more accurate
+        # on label names than on long descriptions, so names are the default.
+        if (options or {}).get("label_descriptions", self.cfg.get("label_descriptions", False)):
+            labels: dict | list = {k: (v or k.replace("_", " ")) for k, v in q.criteria.items()}
+        else:
+            labels = {k: k.replace("_", " ") for k in q.criteria}
+        spec = {q.key: {"labels": labels}}
         out: list[Classification | None] = [None] * len(texts)
         if not idx:
             return out

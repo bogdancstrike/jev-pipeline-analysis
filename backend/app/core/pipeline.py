@@ -142,6 +142,13 @@ class JobRunner:
         self.queues: dict[str, asyncio.Queue] = {m.name: asyncio.Queue() for m in modules if m.scope == Scope.ROW}
         self.enqueued = {name: 0 for name in self.queues}
         self.complete = {m.name: asyncio.Event() for m in modules}
+        # Row alignment across tasks that share an engine (see _wait_turn).
+        self.done_mask = {m.name: bytearray(n) for m in modules if m.scope == Scope.ROW}
+        self.done_upto = {m.name: 0 for m in modules if m.scope == Scope.ROW}
+        self.peers = {m.name: [p for p in modules if p is not m and p.scope == Scope.ROW and m.engine is not None
+                               and p.engine is m.engine] for m in modules}
+        self.window = {m.name: max(1, m.batch_size) * max(1, m.concurrency) * 2 for m in modules}
+        self.progress_event = asyncio.Event()
 
     async def run(self) -> None:
         for m in self.modules:
@@ -170,6 +177,7 @@ class JobRunner:
             first = await q.get()
             if first is None:
                 return
+            await self._wait_turn(m, first)
             batch = [first]
             while len(batch) < m.batch_size:
                 try:
@@ -196,6 +204,29 @@ class JobRunner:
             self.job.metrics[m.name].observe(len(batch), t0, time.time())
             await self._rows_done(m, batch)
 
+    async def _wait_turn(self, m: Module, row: int) -> None:
+        """Keep tasks that share an engine row-aligned: a task waits while it is more than a
+        couple of batches ahead of the slowest unfinished peer. The engine stays saturated
+        (total work is the same), but records finish progressively instead of all at the end."""
+        while True:
+            open_peers = [p for p in self.peers[m.name] if not self.complete[p.name].is_set()]
+            if not open_peers or row <= min(self.done_upto[p.name] for p in open_peers) + self.window[m.name]:
+                return
+            self.progress_event.clear()
+            await self.progress_event.wait()
+
+    def _mark_rows(self, m: Module, rows: list[int]) -> None:
+        mask = self.done_mask.get(m.name)
+        if mask is None:
+            return
+        for i in rows:
+            mask[i] = 1
+        k = self.done_upto[m.name]
+        while k < len(mask) and mask[k]:
+            k += 1
+        self.done_upto[m.name] = k
+        self.progress_event.set()
+
     async def _run_job_scope(self, m: Module) -> None:
         await asyncio.gather(*(self.complete[r].wait() for r in m.requires))
         rows = list(range(self.job.total))
@@ -220,12 +251,14 @@ class JobRunner:
     async def _rows_done(self, m: Module, rows: list[int]) -> None:
         p = self.job.progress[m.name]
         p.done += len(rows)
+        self._mark_rows(m, rows)
         if p.done >= self.job.total and not self.complete[m.name].is_set():
             try:
                 await m.finalize(self.job)
             except Exception:  # noqa: BLE001
                 log.exception("job %s: %s finalize failed", self.job.id, m.name)
             self.complete[m.name].set()
+            self.progress_event.set()
         self.job.touch()
         # Dependents still run on rows that failed here: they see `None` and degrade.
         for d in self.dependents[m.name]:
@@ -269,8 +302,13 @@ class JobManager:
         task.cancel()
         return True
 
-    def delete(self, job: Job) -> None:
+    async def delete(self, job: Job) -> None:
+        # A terminal job may still be saving its history. Wait for the worker (including
+        # on_finish) before the API deletes that history, so it cannot reappear afterward.
+        task = self._tasks.get(job.id)
         self.cancel(job)
+        if task is not None:
+            await asyncio.gather(task, return_exceptions=True)
         self.jobs.pop(job.id, None)
 
     async def _run(self, job: Job, modules: list[Module]) -> None:

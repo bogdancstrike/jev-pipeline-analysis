@@ -2,6 +2,10 @@
 # Keys are what the CSV gets; descriptions are shown to the model, so make them concrete.
 # Rule enforced by the decider: no key may be a token-prefix of another key.
 enabled: true
+# Measured (docs/BENCHMARKS.md): topic from the lead, label names only: 5.7x faster and
+# more accurate than whole text + descriptions on gold-labelled articles.
+max_chars: 1500
+engine_options: {label_descriptions: false}
 engine: gliner            # taxonomy -> GLiNER2.5-Decide (swap to laya / kev / qwen freely)
 instructions: >-
   Which category best matches the main topic of the document?

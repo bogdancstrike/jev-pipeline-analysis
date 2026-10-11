@@ -1,6 +1,9 @@
 # Structured fields (GLiNER2.5): typed records filled from spans of the text itself.
 # Field syntax: "name::str|list::description" (str = one value, list = several).
 enabled: true
+# Measured (docs/BENCHMARKS.md): facts about the main event sit in the lead; 2,500 chars is 1.6x
+# faster than the whole text with 92% identical 'what' (1,500 chars was too lossy).
+max_chars: 2500
 engine: gliner          # structured fields -> GLiNER2.5
 engine_options: {model: extract-multi}   # the general extraction checkpoint
 batch_size: 8

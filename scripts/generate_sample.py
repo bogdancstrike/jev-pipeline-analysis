@@ -152,6 +152,20 @@ def _outbreak(r):
             "disease": r.choice([("rujeolă", "measles"), ("gripă aviară", "avian flu"), ("hepatită A", "hepatitis A")])}
 
 
+# Ground truth per story kind: the event type (config/modules/event.yaml) and the topic labels
+# (config/modules/category.yaml) a correct classifier may give. Written as gold_* columns.
+GOLD = {
+    "flood": ("natural_disaster", "natural_disasters|environment_climate"),
+    "cyber": ("cyber_attack", "cybersecurity"),
+    "protest": ("protest", "labor_social|human_rights|education|health|agriculture_food"),
+    "summit": ("diplomatic_meeting", "defense_military|international_relations"),
+    "arrest": ("crime_incident", "crime_justice"),
+    "fire": ("accident", "accidents_emergencies"),
+    "match": ("sports_event", "sports"),
+    "results": ("economic_event", "business|finance_markets|economy"),
+    "outbreak": ("public_health_event", "health"),
+}
+
 STORY_KINDS = {
     "flood": (_flood, {
         "ro": ["Inundațiile din județul {county} au afectat {homes} de gospodării din {city}. {person}, purtător de cuvânt al ISU {county}, a anunțat {day} că {evac} de persoane au fost evacuate.",
@@ -316,7 +330,7 @@ def generate(rows: int, seed: int = SEED) -> list[list[str]]:
                 lang = langs[0] if k == 0 else r.choices(langs, weights=[4 if x in ("ro", "en") else 1 for x in langs])[0]
                 lead = _fill(r.choice(templates[lang]), slots, lang, r)
                 text = _article(r, lang, lead, [BODY[lang]], slots)
-                out.append([str(len(out) + 1), f"{lang}-{'wire' if lang == 'en' else 'news'}", lang, sid, text])
+                out.append([str(len(out) + 1), f"{lang}-{'wire' if lang == 'en' else 'news'}", lang, sid, *GOLD[kind], text])
         else:
             lang, src, _, tmpl = r.choices(STANDALONE, weights=[w for *_, w, _ in STANDALONE])[0]
             person = _person(r)
@@ -330,14 +344,14 @@ def generate(rows: int, seed: int = SEED) -> list[list[str]]:
             else:
                 banks = [BODY[lang]]
             text = _article(r, lang, lead, banks, {"city": city, "person": person})
-            out.append([str(len(out) + 1), src, lang, "", text])
+            out.append([str(len(out) + 1), src, lang, "", "", "", text])
     return out[:rows]
 
 
 def _write(path: Path, rows: list[list[str]]) -> None:
     with open(path, "w", newline="", encoding="utf-8") as f:
         w = csv.writer(f)
-        w.writerow(["id", "source", "lang", "story", "text"])
+        w.writerow(["id", "source", "lang", "story", "gold_event", "gold_topic", "text"])
         w.writerows(rows)
 
 
@@ -355,7 +369,7 @@ def main() -> None:
         name = "sample.csv" if n == a.rows else f"sample-{n}.csv"
         part = rows[:n]
         _write(a.out_dir / name, part)
-        words = sorted(len(x[4].split()) for x in part)
+        words = sorted(len(x[-1].split()) for x in part)
         manifest.append({"file": name, "rows": n, "ui": n in SUBSETS, "bytes": (a.out_dir / name).stat().st_size,
                          "words_median": words[len(words) // 2], "words_min": words[0], "words_max": words[-1],
                          "languages": sorted({x[2] for x in part}),

@@ -1,5 +1,9 @@
 # Relevance to the analyst brief (Laya). Retarget the feed by rewriting the brief.
 enabled: true
+# Measured (docs/BENCHMARKS.md): the lead (1,024 tokens) is ~2x faster than 2,048 with equal
+# or better accuracy on gold-labelled articles (inverted-pyramid news: the point comes first).
+max_chars: 3500
+engine_options: {max_len: 1024}
 engine: laya            # relevance -> Laya
 instructions: >-
   Analyst brief: security, stability and public safety in Romania and its neighbourhood:

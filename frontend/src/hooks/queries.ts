@@ -99,6 +99,7 @@ export function useLiveJob(id: string | null) {
       qc.invalidateQueries({ queryKey: keys.summary(id) });
       qc.invalidateQueries({ queryKey: keys.rows(id) });
       qc.invalidateQueries({ queryKey: keys.jobs });
+      qc.invalidateQueries({ queryKey: keys.runs });
     }
   }, [id, terminal, qc]);
 

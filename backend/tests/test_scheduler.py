@@ -121,3 +121,43 @@ def test_progress_is_not_pinned_at_zero_by_a_job_level_module():
     job.progress = {"upper": ModuleProgress(done=2), "total": ModuleProgress(done=0)}
     snap = job.snapshot()
     assert snap["done"] == 2 and snap["rows_per_s"] > 0 and snap["percent"] == 50.0
+
+
+class _Engine:  # a stand-in: only identity matters for alignment
+    ready = True
+
+
+SHARED = _Engine()
+
+
+class FastOnEngine(Module):
+    name, title, description, kind = "fast", "Fast", "", Kind.LABEL
+    default_batch_size, default_concurrency = 2, 1
+    max_lead = 0
+
+    async def process_rows(self, job, idxs):
+        slow_done = job.progress["slow"].done
+        FastOnEngine.max_lead = max(FastOnEngine.max_lead, idxs[0] - slow_done)
+        return [1] * len(idxs)
+
+
+class SlowOnEngine(Module):
+    name, title, description, kind = "slow", "Slow", "", Kind.LABEL
+    default_batch_size, default_concurrency = 2, 1
+
+    async def process_rows(self, job, idxs):
+        await asyncio.sleep(0.005)
+        return [1] * len(idxs)
+
+
+@pytest.mark.asyncio
+async def test_tasks_sharing_an_engine_stay_row_aligned():
+    fast, slow = FastOnEngine(ctx()), SlowOnEngine(ctx())
+    fast.engine = slow.engine = SHARED  # same engine object -> peers
+    jm = JobManager(make_settings())
+    df = pd.DataFrame({"id": [str(i) for i in range(200)], "text": ["x"] * 200})
+    job = jm.submit("t.csv", df, ModuleRegistry([fast, slow]).closure(["fast", "slow"]))
+    await wait(job, timeout=20)
+    assert job.status == JobStatus.DONE
+    window = fast.batch_size * fast.concurrency * 2
+    assert FastOnEngine.max_lead <= window + fast.batch_size, FastOnEngine.max_lead

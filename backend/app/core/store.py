@@ -69,6 +69,9 @@ class Store(ABC):
     @abstractmethod
     async def runs(self, limit: int) -> list[dict[str, Any]]: ...
 
+    @abstractmethod
+    async def delete_runs(self, ids: list[str]) -> None: ...
+
 
 class MemoryStore(Store):
     kind = "memory"
@@ -103,6 +106,10 @@ class MemoryStore(Store):
 
     async def runs(self, limit: int) -> list[dict[str, Any]]:
         return sorted(self._runs.values(), key=lambda r: r["created_at"], reverse=True)[:limit]
+
+    async def delete_runs(self, ids: list[str]) -> None:
+        for run_id in ids:
+            self._runs.pop(run_id, None)
 
 
 class PostgresStore(Store):
@@ -177,6 +184,10 @@ class PostgresStore(Store):
                 "metrics FROM runs ORDER BY created_at DESC LIMIT %s", (limit,))
             keys = ("id", "filename", "status", "total", "modules", "created_at", "wall_s", "rows_per_s", "metrics")
             return [dict(zip(keys, (*r[:5], float(r[5]), *r[6:]))) for r in await cur.fetchall()]
+
+    async def delete_runs(self, ids: list[str]) -> None:
+        async with self.pool.connection() as c:
+            await c.execute("DELETE FROM runs WHERE id = ANY(%s)", (ids,))
 
 
 def make_store(database_url: str) -> Store:

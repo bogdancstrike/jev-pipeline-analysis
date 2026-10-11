@@ -1,5 +1,5 @@
-id,source,lang,story,text
-1,ro-social,ro,,"CRAIOVA, 02.12.2027 – Ajutați-l pe Monica, 7 ani, să ajungă la operația din Viena! Orice donație contează. Detalii la Asociația Speranța din Craiova.
+id,source,lang,story,gold_event,gold_topic,text
+1,ro-social,ro,,,,"CRAIOVA, 02.12.2027 – Ajutați-l pe Monica, 7 ani, să ajungă la operația din Viena! Orice donație contează. Detalii la Asociația Speranța din Craiova.
 
 La nivel european, Comisia Europeană a anunțat că monitorizează evoluțiile din regiune. Un purtător de cuvânt al instituției a spus că România poate accesa fonduri suplimentare, dar că cererile trebuie depuse în termenele stabilite și însoțite de documentația completă. Procedura durează, de regulă, câteva luni.
 
@@ -22,7 +22,7 @@ Bugetul local al municipiului Craiova pentru anul 2025 prevede investiții de ap
 Potrivit datelor publicate de ANPC, situația din Craiova s-a deteriorat constant în ultimii ani. Experții consultați de redacție spun că problemele nu sunt noi, dar că autoritățile locale au amânat de prea multe ori deciziile importante. „Am avertizat încă din 2022 că lucrurile vor ajunge aici”, a declarat Bogdan Vasilescu, care a coordonat un studiu pe această temă.
 
 Ministerul de resort a transmis un comunicat în care precizează că toate instituțiile implicate colaborează și că situația este sub control. Documentul mai arată că au fost mobilizate echipe din mai multe județe și că, dacă va fi nevoie, va fi solicitat sprijin și prin mecanismele europene de cooperare."
-2,en-wire,en,s1,"ARAD, 04.07.2027 – NATO defence ministers met in Brussels on Thursday to discuss air defence for Hungary. Deputy Secretary General Andrei Ilie said allies would deliver 3 more Patriot systems.
+2,en-wire,en,s1,diplomatic_meeting,defense_military|international_relations,"ARAD, 04.07.2027 – NATO defence ministers met in Brussels on Thursday to discuss air defence for Hungary. Deputy Secretary General Andrei Ilie said allies would deliver 3 more Patriot systems.
 
 Reactions on social media were numerous. Thousands of users shared images and messages of solidarity, but false information also circulated, which the authorities had to deny. Communication experts recommend relying only on official sources.
 
@@ -49,7 +49,7 @@ At European level, the European Commission said it was monitoring developments i
 At European level, the European Commission said it was monitoring developments in the region. A Commission spokesperson said Romania could access additional funds, but that applications had to be submitted on time and with complete documentation. The procedure usually takes several months.
 
 Non-governmental organisations in Arad have already organised collections and mobilised volunteers. Sebastian Ghiță, who heads a local association, said the community response had been remarkable: in just a few days more than 26 tonnes of food and hygiene products were collected and distributed to affected families."
-3,ro-news,ro,s2,"ORADEA, 23.09.2027 – Percheziții la Oradea într-un dosar de contrabandă cu țigări: 10 suspecți au fost duși la audieri. Purtătorul de cuvânt Ștefan Voicu vorbește de un prejudiciu de 89 milioane de lei.
+3,ro-news,ro,s2,crime_incident,crime_justice,"ORADEA, 23.09.2027 – Percheziții la Oradea într-un dosar de contrabandă cu țigări: 10 suspecți au fost duși la audieri. Purtătorul de cuvânt Ștefan Voicu vorbește de un prejudiciu de 89 milioane de lei.
 
 Prefectul județului Bihor a convocat Comitetul pentru Situații de Urgență, care a stabilit o serie de măsuri imediate. Printre acestea se numără verificarea tuturor clădirilor publice, suplimentarea echipajelor de intervenție și informarea constantă a populației prin mesaje RO-ALERT.
 
@@ -98,7 +98,7 @@ La nivel european, Comisia Europeană a anunțat că monitorizează evoluțiile 
 Bugetul local al municipiului Oradea pentru anul 2020 prevede investiții de aproximativ 30 de milioane de lei, însă o parte importantă a acestora depinde de atragerea fondurilor europene. Consilierii locali urmează să voteze rectificarea bugetară în ședința de luna viitoare.
 
 Potrivit datelor publicate de Agenția pentru Protecția Mediului, situația din Oradea s-a deteriorat constant în ultimii ani. Experții consultați de redacție spun că problemele nu sunt noi, dar că autoritățile locale au amânat de prea multe ori deciziile importante. „Am avertizat încă din 2022 că lucrurile vor ajunge aici”, a declarat Paul Cristea, care a coordonat un studiu pe această temă."
-4,en-wire,en,s2,"ORADEA, 04.12.2027 – Romanian prosecutors detained 10 people in Oradea on Friday in a cigarette smuggling case with estimated losses of 89 million lei, spokesperson Ștefan Voicu said.
+4,en-wire,en,s2,crime_incident,crime_justice,"ORADEA, 04.12.2027 – Romanian prosecutors detained 10 people in Oradea on Friday in a cigarette smuggling case with estimated losses of 89 million lei, spokesperson Ștefan Voicu said.
 
 Representatives of Consiliul Concurenței said they were following developments closely and would publish a detailed report in the coming weeks. Residents of Oradea, meanwhile, complain that official information reaches them slowly and that decisions are taken without public consultation. Several local councillors have called for an extraordinary session.
 
@@ -151,7 +151,7 @@ The prefect of Bihor county convened the emergency committee, which agreed a ser
 Non-governmental organisations in Oradea have already organised collections and mobilised volunteers. Andreea Roman, who heads a local association, said the community response had been remarkable: in just a few days more than 24 tonnes of food and hygiene products were collected and distributed to affected families.
 
 Security specialists warn that such incidents are becoming more frequent and that public institutions are often poorly prepared. An audit carried out last year found that almost 9% of the institutions checked had no up-to-date incident response plans."
-5,ro-news,ro,s3,"TIMIȘOARA, 02.09.2027 – Atac cibernetic la Spitalul Județean Timișoara: sistemele informatice sunt blocate de 2 zile. DNSC confirmă că grupul VoidFang se află în spatele atacului, a declarat Elena Petrescu.
+5,ro-news,ro,s3,cyber_attack,cybersecurity,"TIMIȘOARA, 02.09.2027 – Atac cibernetic la Spitalul Județean Timișoara: sistemele informatice sunt blocate de 2 zile. DNSC confirmă că grupul VoidFang se află în spatele atacului, a declarat Elena Petrescu.
 
 Datele Institutului Național de Statistică arată că în județul Timiș trăiesc peste 920.000 de persoane, iar aproape 6% dintre acestea locuiesc în mediul rural. Specialiștii atrag atenția că infrastructura din zonele rurale este mult mai vulnerabilă și că investițiile din ultimii ani au fost insuficiente.
 
@@ -180,7 +180,7 @@ Ministerul de resort a transmis un comunicat în care precizează că toate inst
 Opoziția a criticat dur reacția autorităților. Deputatul Silvia Rotaru a cerut demisia celor responsabili și a anunțat că va depune o interpelare în Parlament. „Este inacceptabil ca, în 2024, oamenii să fie lăsați singuri în fața unor astfel de situații”, a declarat acesta într-o conferință de presă.
 
 Organizațiile neguvernamentale din Timișoara au organizat deja colecte și au mobilizat voluntari. Președintele unei asociații locale, Victor Dumitru, spune că răspunsul comunității a fost impresionant: în doar câteva zile au fost strânse peste 22 de tone de alimente și produse de igienă, distribuite familiilor afectate."
-6,ro-news,ro,s3,"TIMIȘOARA, 10.12.2027 – Directoratul Național de Securitate Cibernetică a emis duminică o alertă după un atac ransomware asupra Spitalul Județean Timișoara. Grupul VoidFang revendică atacul și cere 9 milioane de euro.
+6,ro-news,ro,s3,cyber_attack,cybersecurity,"TIMIȘOARA, 10.12.2027 – Directoratul Național de Securitate Cibernetică a emis duminică o alertă după un atac ransomware asupra Spitalul Județean Timișoara. Grupul VoidFang revendică atacul și cere 9 milioane de euro.
 
 Primarul din Timișoara a declarat că administrația a alocat deja 80 de milioane de lei pentru măsuri urgente și că va solicita sprijin de la Guvern. „Nu putem rezolva singuri o problemă de această amploare”, a spus edilul, care a adăugat că o echipă de specialiști va evalua costurile reale până la sfârșitul lunii.
 
@@ -203,7 +203,7 @@ Primarul din Timișoara a declarat că administrația a alocat deja 34 de milioa
 La nivel european, Comisia Europeană a anunțat că monitorizează evoluțiile din regiune. Un purtător de cuvânt al instituției a spus că România poate accesa fonduri suplimentare, dar că cererile trebuie depuse în termenele stabilite și însoțite de documentația completă. Procedura durează, de regulă, câteva luni.
 
 Reacțiile pe rețelele sociale au fost numeroase. Mii de utilizatori au distribuit imagini și mesaje de solidaritate, însă au circulat și informații false, pe care autoritățile au fost nevoite să le dezmintă. Experții în comunicare recomandă ca oamenii să se informeze doar din surse oficiale."
-7,en-wire,en,,"PLOIEȘTI, 08.12.2027 – Moldova and the European Union signed an agreement in Chișinău to connect Moldova's power grid to the EU market by 2028.
+7,en-wire,en,,,,"PLOIEȘTI, 08.12.2027 – Moldova and the European Union signed an agreement in Chișinău to connect Moldova's power grid to the EU market by 2028.
 
 The Ploiești municipal budget for 2022 provides for investment of around 5 million lei, but a large part of it depends on attracting European funds. Local councillors are due to vote on the budget revision at next month's session.
 
@@ -248,7 +248,7 @@ The opposition sharply criticised the authorities' response. Lawmaker Oana Flore
 According to figures published by ANRE, the situation in Ploiești has deteriorated steadily over recent years. Experts consulted for this article say the problems are not new, but that local authorities have repeatedly postponed key decisions. ""We warned back in 2021 that it would come to this,"" said Cristian Stanciu, who led a study on the subject.
 
 Security specialists warn that such incidents are becoming more frequent and that public institutions are often poorly prepared. An audit carried out last year found that almost 4% of the institutions checked had no up-to-date incident response plans."
-8,ro-news,ro,s4,"BACĂU, 18.12.2027 – Inundațiile din județul Bacău au afectat 82 de gospodării din Bacău. Silvia Stan, purtător de cuvânt al ISU Bacău, a anunțat sâmbătă că 281 de persoane au fost evacuate.
+8,ro-news,ro,s4,natural_disaster,natural_disasters|environment_climate,"BACĂU, 18.12.2027 – Inundațiile din județul Bacău au afectat 82 de gospodării din Bacău. Silvia Stan, purtător de cuvânt al ISU Bacău, a anunțat sâmbătă că 281 de persoane au fost evacuate.
 
 Primarul din Bacău a declarat că administrația a alocat deja 79 de milioane de lei pentru măsuri urgente și că va solicita sprijin de la Guvern. „Nu putem rezolva singuri o problemă de această amploare”, a spus edilul, care a adăugat că o echipă de specialiști va evalua costurile reale până la sfârșitul lunii.
 
@@ -291,7 +291,7 @@ Reprezentanții Banca Națională a României au transmis că urmăresc evoluți
 Potrivit datelor publicate de Curtea de Conturi, situația din Bacău s-a deteriorat constant în ultimii ani. Experții consultați de redacție spun că problemele nu sunt noi, dar că autoritățile locale au amânat de prea multe ori deciziile importante. „Am avertizat încă din 2025 că lucrurile vor ajunge aici”, a declarat Emil Chiriac, care a coordonat un studiu pe această temă.
 
 Reprezentanții ANRE au transmis că urmăresc evoluția situației și că vor publica un raport detaliat în următoarele săptămâni. Între timp, locuitorii din Bacău se plâng că informațiile oficiale ajung greu la ei și că deciziile sunt luate fără consultare publică. Mai mulți consilieri locali au cerut o ședință extraordinară."
-9,en-wire,en,s4,"BACĂU, 06.07.2027 – Floods in Romania's Bacău county damaged 82 homes in Bacău on Sunday. Silvia Stan, a spokesperson for the emergency service ISU Bacău, said 281 people were evacuated.
+9,en-wire,en,s4,natural_disaster,natural_disasters|environment_climate,"BACĂU, 06.07.2027 – Floods in Romania's Bacău county damaged 82 homes in Bacău on Sunday. Silvia Stan, a spokesperson for the emergency service ISU Bacău, said 281 people were evacuated.
 
 Reactions on social media were numerous. Thousands of users shared images and messages of solidarity, but false information also circulated, which the authorities had to deny. Communication experts recommend relying only on official sources.
 
@@ -310,7 +310,7 @@ Reactions on social media were numerous. Thousands of users shared images and me
 Economists estimate that the impact on the local economy could exceed 37 million euros. Businesses in the area, especially small and medium-sized firms, were hit hardest, and some have had to suspend operations temporarily. The Bacău Chamber of Commerce has asked for tax relief.
 
 Security specialists warn that such incidents are becoming more frequent and that public institutions are often poorly prepared. An audit carried out last year found that almost 36% of the institutions checked had no up-to-date incident response plans."
-10,ro-news,ro,s5,"SUCEAVA, 13.05.2027 – Inundațiile din județul Suceava au afectat 790 de gospodării din Suceava. Delia Dragomir, purtător de cuvânt al ISU Suceava, a anunțat luni că 213 de persoane au fost evacuate.
+10,ro-news,ro,s5,natural_disaster,natural_disasters|environment_climate,"SUCEAVA, 13.05.2027 – Inundațiile din județul Suceava au afectat 790 de gospodării din Suceava. Delia Dragomir, purtător de cuvânt al ISU Suceava, a anunțat luni că 213 de persoane au fost evacuate.
 
 Specialiștii în securitate atrag atenția că astfel de incidente devin tot mai frecvente și că instituțiile publice sunt adesea slab pregătite. Un audit realizat anul trecut a arătat că aproape 20% dintre instituțiile verificate nu aveau planuri actualizate de răspuns la incidente.
 
@@ -337,7 +337,7 @@ Datele Institutului Național de Statistică arată că în județul Suceava tr�
 Prefectul județului Suceava a convocat Comitetul pentru Situații de Urgență, care a stabilit o serie de măsuri imediate. Printre acestea se numără verificarea tuturor clădirilor publice, suplimentarea echipajelor de intervenție și informarea constantă a populației prin mesaje RO-ALERT.
 
 Ancheta este abia la început, iar procurorii nu exclud ca și alte persoane să fie implicate. Surse judiciare citate de presa locală spun că anchetatorii analizează documente din ultimii 11 ani și că au fost audiați deja mai mulți martori, printre care și foști angajați ai instituțiilor implicate."
-11,hu-news,hu,s5,"SUCEAVA, 05.06.2027 – Árvíz sújtotta Szucsáva városát: 790 ház megrongálódott, 213 embert kitelepítettek – közölte Delia Dragomir.
+11,hu-news,hu,s5,natural_disaster,natural_disasters|environment_climate,"SUCEAVA, 05.06.2027 – Árvíz sújtotta Szucsáva városát: 790 ház megrongálódott, 213 embert kitelepítettek – közölte Delia Dragomir.
 
 Európai szinten az Európai Bizottság figyelemmel kíséri a fejleményeket. Egy szóvivő szerint Románia további forrásokat igényelhet, ha a kérelmeket határidőre és hiánytalanul benyújtja.
 
@@ -370,7 +370,7 @@ A kutatók az elmúlt két évtized adatait elemezték, és az ilyen események 
 A helyi civil szervezetek gyűjtést szerveztek és önkénteseket mozgósítottak. Néhány nap alatt több mint 15 tonna élelmiszert osztottak szét az érintett családok között – mondta Lucian Petrescu.
 
 A helyi civil szervezetek gyűjtést szerveztek és önkénteseket mozgósítottak. Néhány nap alatt több mint 14 tonna élelmiszert osztottak szét az érintett családok között – mondta Nicolae Pavel."
-12,ro-news,ro,s6,"TIMIȘOARA, 10.11.2027 – Victorie pentru Rapid București în meciul cu Universitatea Craiova: 3-2. Decisiv a fost Cătălina Munteanu, care a înscris în minutul 69.
+12,ro-news,ro,s6,sports_event,sports,"TIMIȘOARA, 10.11.2027 – Victorie pentru Rapid București în meciul cu Universitatea Craiova: 3-2. Decisiv a fost Cătălina Munteanu, care a înscris în minutul 69.
 
 Cercetătorii de la Universitatea din Timișoara au analizat date din ultimele două decenii și au constatat o creștere clară a frecvenței unor astfel de evenimente. Concluziile lor, publicate într-o revistă de specialitate, arată că fără investiții majore riscurile vor continua să crească în următorii ani.
 
@@ -389,7 +389,7 @@ Primarul din Timișoara a declarat că administrația a alocat deja 85 de milioa
 Opoziția a criticat dur reacția autorităților. Deputatul Matei Popescu a cerut demisia celor responsabili și a anunțat că va depune o interpelare în Parlament. „Este inacceptabil ca, în 2020, oamenii să fie lăsați singuri în fața unor astfel de situații”, a declarat acesta într-o conferință de presă.
 
 La nivel european, Comisia Europeană a anunțat că monitorizează evoluțiile din regiune. Un purtător de cuvânt al instituției a spus că România poate accesa fonduri suplimentare, dar că cererile trebuie depuse în termenele stabilite și însoțite de documentația completă. Procedura durează, de regulă, câteva luni."
-13,hu-news,hu,s6,"CONSTANȚA, 14.09.2027 – A Rapid București 3-2 arányban legyőzte a Universitatea Craiova csapatát; Cătălina Munteanu a(z) 69. percben szerzett gólt.
+13,hu-news,hu,s6,sports_event,sports,"CONSTANȚA, 14.09.2027 – A Rapid București 3-2 arányban legyőzte a Universitatea Craiova csapatát; Cătălina Munteanu a(z) 69. percben szerzett gólt.
 
 A kutatók az elmúlt két évtized adatait elemezték, és az ilyen események gyakoriságának egyértelmű növekedését állapították meg. Jelentős beruházások nélkül a kockázatok tovább nőnek – figyelmeztetnek.
 
@@ -436,7 +436,7 @@ A kutatók az elmúlt két évtized adatait elemezték, és az ilyen események 
 Az ellenzék élesen bírálta a hatóságok reakcióját. Ionuț Drăgan képviselő a felelősök lemondását követelte, és interpellációt jelentett be a parlamentben.
 
 Az ellenzék élesen bírálta a hatóságok reakcióját. Lavinia Drăgan képviselő a felelősök lemondását követelte, és interpellációt jelentett be a parlamentben."
-14,en-wire,en,s6,"PLOIEȘTI, 28.03.2027 – Rapid București beat Universitatea Craiova 3-2, with Cătălina Munteanu scoring in the 69th minute.
+14,en-wire,en,s6,sports_event,sports,"PLOIEȘTI, 28.03.2027 – Rapid București beat Universitatea Craiova 3-2, with Cătălina Munteanu scoring in the 69th minute.
 
 At European level, the European Commission said it was monitoring developments in the region. A Commission spokesperson said Romania could access additional funds, but that applications had to be submitted on time and with complete documentation. The procedure usually takes several months.
 
@@ -465,7 +465,7 @@ The mayor of Ploiești said the administration had already allocated 4 million l
 The opposition sharply criticised the authorities' response. Lawmaker Radu Constantin called for those responsible to resign and announced a formal question in parliament. ""It is unacceptable that in 2021 people are left on their own in situations like this,"" the lawmaker told a press conference.
 
 Non-governmental organisations in Ploiești have already organised collections and mobilised volunteers. Maria Florea, who heads a local association, said the community response had been remarkable: in just a few days more than 75 tonnes of food and hygiene products were collected and distributed to affected families."
-15,hu-news,hu,s6,"BACĂU, 20.11.2027 – A Rapid București 3-2 arányban legyőzte a Universitatea Craiova csapatát; Cătălina Munteanu a(z) 69. percben szerzett gólt.
+15,hu-news,hu,s6,sports_event,sports,"BACĂU, 20.11.2027 – A Rapid București 3-2 arányban legyőzte a Universitatea Craiova csapatát; Cătălina Munteanu a(z) 69. percben szerzett gólt.
 
 Az ellenzék élesen bírálta a hatóságok reakcióját. Ana Toma képviselő a felelősök lemondását követelte, és interpellációt jelentett be a parlamentben.
 
@@ -516,7 +516,7 @@ A(z) Agenția Națională de Administrare Fiscală adatai szerint Bacău helyzet
 A kutatók az elmúlt két évtized adatait elemezték, és az ilyen események gyakoriságának egyértelmű növekedését állapították meg. Jelentős beruházások nélkül a kockázatok tovább nőnek – figyelmeztetnek.
 
 A kutatók az elmúlt két évtized adatait elemezték, és az ilyen események gyakoriságának egyértelmű növekedését állapították meg. Jelentős beruházások nélkül a kockázatok tovább nőnek – figyelmeztetnek."
-16,ro-news,ro,s7,"TULCEA, 07.12.2027 – Directoratul Național de Securitate Cibernetică a emis luni o alertă după un atac ransomware asupra Institutul Oncologic Tulcea. Grupul LockNest revendică atacul și cere 4 milioane de euro.
+16,ro-news,ro,s7,cyber_attack,cybersecurity,"TULCEA, 07.12.2027 – Directoratul Național de Securitate Cibernetică a emis luni o alertă după un atac ransomware asupra Institutul Oncologic Tulcea. Grupul LockNest revendică atacul și cere 4 milioane de euro.
 
 Ministerul de resort a transmis un comunicat în care precizează că toate instituțiile implicate colaborează și că situația este sub control. Documentul mai arată că au fost mobilizate echipe din mai multe județe și că, dacă va fi nevoie, va fi solicitat sprijin și prin mecanismele europene de cooperare.
 
@@ -577,7 +577,7 @@ Cercetătorii de la Universitatea din Tulcea au analizat date din ultimele două
 Potrivit datelor publicate de ANPC, situația din Tulcea s-a deteriorat constant în ultimii ani. Experții consultați de redacție spun că problemele nu sunt noi, dar că autoritățile locale au amânat de prea multe ori deciziile importante. „Am avertizat încă din 2024 că lucrurile vor ajunge aici”, a declarat Paul Ghiță, care a coordonat un studiu pe această temă.
 
 Bugetul local al municipiului Tulcea pentru anul 2022 prevede investiții de aproximativ 73 de milioane de lei, însă o parte importantă a acestora depinde de atragerea fondurilor europene. Consilierii locali urmează să voteze rectificarea bugetară în ședința de luna viitoare."
-17,en-wire,en,s8,"GALAȚI, 07.02.2027 – NATO defence ministers met in Brussels on Tuesday to discuss air defence for Moldova. Deputy Secretary General Daria Nistor said allies would deliver 3 more Patriot systems.
+17,en-wire,en,s8,diplomatic_meeting,defense_military|international_relations,"GALAȚI, 07.02.2027 – NATO defence ministers met in Brussels on Tuesday to discuss air defence for Moldova. Deputy Secretary General Daria Nistor said allies would deliver 3 more Patriot systems.
 
 According to figures published by Inspectoratul Școlar, the situation in Galați has deteriorated steadily over recent years. Experts consulted for this article say the problems are not new, but that local authorities have repeatedly postponed key decisions. ""We warned back in 2025 that it would come to this,"" said Sorin Căpraru, who led a study on the subject.
 
@@ -596,7 +596,7 @@ Security specialists warn that such incidents are becoming more frequent and tha
 Representatives of Consiliul Concurenței said they were following developments closely and would publish a detailed report in the coming weeks. Residents of Galați, meanwhile, complain that official information reaches them slowly and that decisions are taken without public consultation. Several local councillors have called for an extraordinary session.
 
 The mayor of Galați said the administration had already allocated 72 million lei for urgent measures and would ask the government for support. ""We cannot solve a problem of this size on our own,"" the mayor said, adding that a team of specialists would assess the real costs by the end of the month."
-18,fr-news,fr,s8,"BRĂILA, 27.08.2027 – Les ministres de la Défense de l'OTAN se sont réunis vendredi à Bruxelles; Daria Nistor a annoncé 3 systèmes Patriot supplémentaires pour Moldova.
+18,fr-news,fr,s8,diplomatic_meeting,defense_military|international_relations,"BRĂILA, 27.08.2027 – Les ministres de la Défense de l'OTAN se sont réunis vendredi à Bruxelles; Daria Nistor a annoncé 3 systèmes Patriot supplémentaires pour Moldova.
 
 Le maire de Brăila a indiqué que la municipalité avait déjà débloqué 40 millions de lei pour des mesures d'urgence et qu'elle solliciterait l'aide du gouvernement. Une équipe de spécialistes doit évaluer le coût réel d'ici la fin du mois.
 
@@ -613,7 +613,7 @@ Le maire de Brăila a indiqué que la municipalité avait déjà débloqué 62 m
 L'opposition a vivement critiqué la réaction des autorités. Le député Ștefan Pană a réclamé la démission des responsables et annoncé une question écrite au Parlement, dénonçant une gestion « improvisée » de la crise.
 
 Les associations locales ont organisé des collectes et mobilisé des bénévoles. En quelques jours, plus de 31 tonnes de denrées ont été distribuées aux familles touchées, selon Matei Oprea, responsable d'une ONG de Brăila."
-19,ru-channel,ru,,"PLOIEȘTI, 06.11.2027 – Западные СМИ снова лгут. А как насчёт их собственных войн? Почему никто не спрашивает об Ираке? Пусть сначала посмотрят на себя.
+19,ru-channel,ru,,,,"PLOIEȘTI, 06.11.2027 – Западные СМИ снова лгут. А как насчёт их собственных войн? Почему никто не спрашивает об Ираке? Пусть сначала посмотрят на себя.
 
 Мэр города сообщил, что администрация уже выделила 56 миллионов леев на срочные меры и обратится за помощью к правительству. Группа специалистов оценит реальные затраты до конца месяца.
 
@@ -650,7 +650,7 @@ Les associations locales ont organisé des collectes et mobilisé des bénévole
 Будем честны: никто в столице не думает о простых людях. Элиты делят должности и деньги, а счёт оплачиваем мы. Нам годами говорят потерпеть, но наше терпение закончилось.
 
 Оппозиция резко раскритиковала действия властей. Депутат Диана Унгуреану потребовал отставки ответственных лиц и объявил о запросе в парламент."
-20,ro-news,ro,s9,"SATU MARE, 26.07.2027 – Atac cibernetic la Spitalul Județean Satu Mare: sistemele informatice sunt blocate de 7 zile. DNSC confirmă că grupul BlackHarbor se află în spatele atacului, a declarat Andrei Vlădescu.
+20,ro-news,ro,s9,cyber_attack,cybersecurity,"SATU MARE, 26.07.2027 – Atac cibernetic la Spitalul Județean Satu Mare: sistemele informatice sunt blocate de 7 zile. DNSC confirmă că grupul BlackHarbor se află în spatele atacului, a declarat Andrei Vlădescu.
 
 Specialiștii în securitate atrag atenția că astfel de incidente devin tot mai frecvente și că instituțiile publice sunt adesea slab pregătite. Un audit realizat anul trecut a arătat că aproape 18% dintre instituțiile verificate nu aveau planuri actualizate de răspuns la incidente.
 
@@ -681,7 +681,7 @@ Reacțiile pe rețelele sociale au fost numeroase. Mii de utilizatori au distrib
 Bugetul local al municipiului Satu Mare pentru anul 2023 prevede investiții de aproximativ 11 de milioane de lei, însă o parte importantă a acestora depinde de atragerea fondurilor europene. Consilierii locali urmează să voteze rectificarea bugetară în ședința de luna viitoare.
 
 La nivel european, Comisia Europeană a anunțat că monitorizează evoluțiile din regiune. Un purtător de cuvânt al instituției a spus că România poate accesa fonduri suplimentare, dar că cererile trebuie depuse în termenele stabilite și însoțite de documentația completă. Procedura durează, de regulă, câteva luni."
-21,ro-news,ro,s9,"SATU MARE, 01.06.2027 – Directoratul Național de Securitate Cibernetică a emis vineri o alertă după un atac ransomware asupra Spitalul Județean Satu Mare. Grupul BlackHarbor revendică atacul și cere 2 milioane de euro.
+21,ro-news,ro,s9,cyber_attack,cybersecurity,"SATU MARE, 01.06.2027 – Directoratul Național de Securitate Cibernetică a emis vineri o alertă după un atac ransomware asupra Spitalul Județean Satu Mare. Grupul BlackHarbor revendică atacul și cere 2 milioane de euro.
 
 Datele Institutului Național de Statistică arată că în județul Satu Mare trăiesc peste 890.000 de persoane, iar aproape 56% dintre acestea locuiesc în mediul rural. Specialiștii atrag atenția că infrastructura din zonele rurale este mult mai vulnerabilă și că investițiile din ultimii ani au fost insuficiente.
 
@@ -702,7 +702,7 @@ Organizațiile neguvernamentale din Satu Mare au organizat deja colecte și au m
 Analiștii economici estimează că impactul asupra economiei locale ar putea depăși 85 de milioane de euro. Firmele din zonă, în special cele mici și mijlocii, au fost cel mai grav afectate, iar unele dintre ele au fost nevoite să își suspende temporar activitatea. Camera de Comerț din Satu Mare a cerut scutiri de taxe.
 
 Reprezentanții Consiliul Concurenței au transmis că urmăresc evoluția situației și că vor publica un raport detaliat în următoarele săptămâni. Între timp, locuitorii din Satu Mare se plâng că informațiile oficiale ajung greu la ei și că deciziile sunt luate fără consultare publică. Mai mulți consilieri locali au cerut o ședință extraordinară."
-22,ro-news,ro,s9,"SATU MARE, 21.04.2027 – Directoratul Național de Securitate Cibernetică a emis vineri o alertă după un atac ransomware asupra Spitalul Județean Satu Mare. Grupul BlackHarbor revendică atacul și cere 2 milioane de euro.
+22,ro-news,ro,s9,cyber_attack,cybersecurity,"SATU MARE, 21.04.2027 – Directoratul Național de Securitate Cibernetică a emis vineri o alertă după un atac ransomware asupra Spitalul Județean Satu Mare. Grupul BlackHarbor revendică atacul și cere 2 milioane de euro.
 
 Ministerul de resort a transmis un comunicat în care precizează că toate instituțiile implicate colaborează și că situația este sub control. Documentul mai arată că au fost mobilizate echipe din mai multe județe și că, dacă va fi nevoie, va fi solicitat sprijin și prin mecanismele europene de cooperare.
 
@@ -727,7 +727,7 @@ Sindicatele din sector susțin că angajații lucrează în condiții dificile �
 Opoziția a criticat dur reacția autorităților. Deputatul Camelia Anghel a cerut demisia celor responsabili și a anunțat că va depune o interpelare în Parlament. „Este inacceptabil ca, în 2026, oamenii să fie lăsați singuri în fața unor astfel de situații”, a declarat acesta într-o conferință de presă.
 
 Ministerul de resort a transmis un comunicat în care precizează că toate instituțiile implicate colaborează și că situația este sub control. Documentul mai arată că au fost mobilizate echipe din mai multe județe și că, dacă va fi nevoie, va fi solicitat sprijin și prin mecanismele europene de cooperare."
-23,ro-news,ro,s9,"SATU MARE, 14.12.2027 – Directoratul Național de Securitate Cibernetică a emis joi o alertă după un atac ransomware asupra Spitalul Județean Satu Mare. Grupul BlackHarbor revendică atacul și cere 2 milioane de euro.
+23,ro-news,ro,s9,cyber_attack,cybersecurity,"SATU MARE, 14.12.2027 – Directoratul Național de Securitate Cibernetică a emis joi o alertă după un atac ransomware asupra Spitalul Județean Satu Mare. Grupul BlackHarbor revendică atacul și cere 2 milioane de euro.
 
 La nivel european, Comisia Europeană a anunțat că monitorizează evoluțiile din regiune. Un purtător de cuvânt al instituției a spus că România poate accesa fonduri suplimentare, dar că cererile trebuie depuse în termenele stabilite și însoțite de documentația completă. Procedura durează, de regulă, câteva luni.
 
@@ -772,7 +772,7 @@ Prefectul județului Satu Mare a convocat Comitetul pentru Situații de Urgenț�
 Bugetul local al municipiului Satu Mare pentru anul 2024 prevede investiții de aproximativ 46 de milioane de lei, însă o parte importantă a acestora depinde de atragerea fondurilor europene. Consilierii locali urmează să voteze rectificarea bugetară în ședința de luna viitoare.
 
 Potrivit datelor publicate de Banca Națională a României, situația din Satu Mare s-a deteriorat constant în ultimii ani. Experții consultați de redacție spun că problemele nu sunt noi, dar că autoritățile locale au amânat de prea multe ori deciziile importante. „Am avertizat încă din 2025 că lucrurile vor ajunge aici”, a declarat Andreea Gheorghe, care a coordonat un studiu pe această temă."
-24,ro-blog,ro,,"CLUJ-NAPOCA, 22.02.2027 – Experții independenți spun clar: noul vaccin a fost testat prea puțin. Ce ne ascund autoritățile? De ce nu răspunde nimeni, domnule Mirela Tudor?
+24,ro-blog,ro,,,,"CLUJ-NAPOCA, 22.02.2027 – Experții independenți spun clar: noul vaccin a fost testat prea puțin. Ce ne ascund autoritățile? De ce nu răspunde nimeni, domnule Mirela Tudor?
 
 Potrivit datelor publicate de Curtea de Conturi, situația din Cluj-Napoca s-a deteriorat constant în ultimii ani. Experții consultați de redacție spun că problemele nu sunt noi, dar că autoritățile locale au amânat de prea multe ori deciziile importante. „Am avertizat încă din 2023 că lucrurile vor ajunge aici”, a declarat Petru Olteanu, care a coordonat un studiu pe această temă.
 
@@ -813,7 +813,7 @@ Cercetătorii de la Universitatea din Cluj-Napoca au analizat date din ultimele 
 Ministerul de resort a transmis un comunicat în care precizează că toate instituțiile implicate colaborează și că situația este sub control. Documentul mai arată că au fost mobilizate echipe din mai multe județe și că, dacă va fi nevoie, va fi solicitat sprijin și prin mecanismele europene de cooperare.
 
 Istoria ne arată că popoarele care nu își apără identitatea dispar. Strămoșii noștri au luptat pentru fiecare palmă de pământ, iar noi îi lăsăm pe alții să decidă în locul nostru. Este momentul să spunem răspicat: ajunge!"
-25,en-mag,en,,"BUZĂU, 12.07.2027 – Ten hidden beaches on the Black Sea coast you should visit this summer, from Vama Veche to Sfântu Gheorghe.
+25,en-mag,en,,,,"BUZĂU, 12.07.2027 – Ten hidden beaches on the Black Sea coast you should visit this summer, from Vama Veche to Sfântu Gheorghe.
 
 Non-governmental organisations in Buzău have already organised collections and mobilised volunteers. Carmen Ghiță, who heads a local association, said the community response had been remarkable: in just a few days more than 84 tonnes of food and hygiene products were collected and distributed to affected families.
 
@@ -832,7 +832,7 @@ The opposition sharply criticised the authorities' response. Lawmaker Adela Simi
 Unions in the sector say staff are working in difficult conditions and that understaffing is one of the main problems. Union leader Viorel Rotaru said that if their demands are not met by the end of the year, members would hold a warning strike.
 
 The investigation has only just begun, and prosecutors do not rule out that others were involved. Judicial sources quoted by local media say investigators are examining documents covering the past 5 years and have already questioned several witnesses, including former employees."
-26,ro-news,ro,s10,"CLUJ-NAPOCA, 16.07.2027 – Alertă sanitară la Cluj-Napoca: 161 de cazuri de rujeolă. DSP Cluj a declanșat ancheta epidemiologică, a anunțat Cătălina Avram.
+26,ro-news,ro,s10,public_health_event,health,"CLUJ-NAPOCA, 16.07.2027 – Alertă sanitară la Cluj-Napoca: 161 de cazuri de rujeolă. DSP Cluj a declanșat ancheta epidemiologică, a anunțat Cătălina Avram.
 
 Bugetul local al municipiului Cluj-Napoca pentru anul 2021 prevede investiții de aproximativ 26 de milioane de lei, însă o parte importantă a acestora depinde de atragerea fondurilor europene. Consilierii locali urmează să voteze rectificarea bugetară în ședința de luna viitoare.
 
@@ -849,7 +849,7 @@ Potrivit datelor publicate de Institutul Național de Statistică, situația din
 Organizațiile neguvernamentale din Cluj-Napoca au organizat deja colecte și au mobilizat voluntari. Președintele unei asociații locale, Valentin Stanciu, spune că răspunsul comunității a fost impresionant: în doar câteva zile au fost strânse peste 13 de tone de alimente și produse de igienă, distribuite familiilor afectate.
 
 Primarul din Cluj-Napoca a declarat că administrația a alocat deja 85 de milioane de lei pentru măsuri urgente și că va solicita sprijin de la Guvern. „Nu putem rezolva singuri o problemă de această amploare”, a spus edilul, care a adăugat că o echipă de specialiști va evalua costurile reale până la sfârșitul lunii."
-27,en-wire,en,s10,"CLUJ-NAPOCA, 22.07.2027 – Romania's health ministry confirmed a measles outbreak in Cluj-Napoca, with 161 cases so far, epidemiologist Cătălina Avram said.
+27,en-wire,en,s10,public_health_event,health,"CLUJ-NAPOCA, 22.07.2027 – Romania's health ministry confirmed a measles outbreak in Cluj-Napoca, with 161 cases so far, epidemiologist Cătălina Avram said.
 
 The Cluj-Napoca municipal budget for 2021 provides for investment of around 50 million lei, but a large part of it depends on attracting European funds. Local councillors are due to vote on the budget revision at next month's session.
 
@@ -892,7 +892,7 @@ National statistics show that more than 840,000 people live in Cluj county, and 
 Representatives of Agenția Națională de Administrare Fiscală said they were following developments closely and would publish a detailed report in the coming weeks. Residents of Cluj-Napoca, meanwhile, complain that official information reaches them slowly and that decisions are taken without public consultation. Several local councillors have called for an extraordinary session.
 
 The investigation has only just begun, and prosecutors do not rule out that others were involved. Judicial sources quoted by local media say investigators are examining documents covering the past 93 years and have already questioned several witnesses, including former employees."
-28,ro-news,ro,,"BUZĂU, 26.02.2027 – Parlamentul a adoptat legea privind protecția datelor în sectorul energetic, care obligă operatorii să raporteze incidentele cibernetice în 24 de ore.
+28,ro-news,ro,,,,"BUZĂU, 26.02.2027 – Parlamentul a adoptat legea privind protecția datelor în sectorul energetic, care obligă operatorii să raporteze incidentele cibernetice în 24 de ore.
 
 Analiștii economici estimează că impactul asupra economiei locale ar putea depăși 19 de milioane de euro. Firmele din zonă, în special cele mici și mijlocii, au fost cel mai grav afectate, iar unele dintre ele au fost nevoite să își suspende temporar activitatea. Camera de Comerț din Buzău a cerut scutiri de taxe.
 
@@ -925,7 +925,7 @@ Analiștii economici estimează că impactul asupra economiei locale ar putea de
 Sindicatele din sector susțin că angajații lucrează în condiții dificile și că lipsa de personal este una dintre principalele probleme. Liderul sindical Matei Sandu a declarat că, dacă revendicările nu vor fi îndeplinite până la sfârșitul anului, membrii organizației vor intra în grevă de avertisment.
 
 Ministerul de resort a transmis un comunicat în care precizează că toate instituțiile implicate colaborează și că situația este sub control. Documentul mai arată că au fost mobilizate echipe din mai multe județe și că, dacă va fi nevoie, va fi solicitat sprijin și prin mecanismele europene de cooperare."
-29,ro-news,ro,s11,"CLUJ-NAPOCA, 04.02.2027 – Peste 7000 de fermieri au protestat marți în centrul orașului Cluj-Napoca, cerând salarii mai mari. Liderul sindical Florin Chiriac a anunțat grevă generală.
+29,ro-news,ro,s11,protest,labor_social|human_rights|education|health|agriculture_food,"CLUJ-NAPOCA, 04.02.2027 – Peste 7000 de fermieri au protestat marți în centrul orașului Cluj-Napoca, cerând salarii mai mari. Liderul sindical Florin Chiriac a anunțat grevă generală.
 
 Bugetul local al municipiului Cluj-Napoca pentru anul 2026 prevede investiții de aproximativ 38 de milioane de lei, însă o parte importantă a acestora depinde de atragerea fondurilor europene. Consilierii locali urmează să voteze rectificarea bugetară în ședința de luna viitoare.
 
@@ -946,7 +946,7 @@ Ancheta este abia la început, iar procurorii nu exclud ca și alte persoane să
 Specialiștii în securitate atrag atenția că astfel de incidente devin tot mai frecvente și că instituțiile publice sunt adesea slab pregătite. Un audit realizat anul trecut a arătat că aproape 9% dintre instituțiile verificate nu aveau planuri actualizate de răspuns la incidente.
 
 Cercetătorii de la Universitatea din Cluj-Napoca au analizat date din ultimele două decenii și au constatat o creștere clară a frecvenței unor astfel de evenimente. Concluziile lor, publicate într-o revistă de specialitate, arată că fără investiții majore riscurile vor continua să crească în următorii ani."
-30,en-wire,en,s11,"CLUJ-NAPOCA, 22.12.2027 – More than 7000 farmers rallied in Cluj-Napoca on Saturday demanding higher pay. Union leader Florin Chiriac announced a general strike.
+30,en-wire,en,s11,protest,labor_social|human_rights|education|health|agriculture_food,"CLUJ-NAPOCA, 22.12.2027 – More than 7000 farmers rallied in Cluj-Napoca on Saturday demanding higher pay. Union leader Florin Chiriac announced a general strike.
 
 Economists estimate that the impact on the local economy could exceed 76 million euros. Businesses in the area, especially small and medium-sized firms, were hit hardest, and some have had to suspend operations temporarily. The Cluj-Napoca Chamber of Commerce has asked for tax relief.
 
@@ -961,7 +961,7 @@ The prefect of Cluj county convened the emergency committee, which agreed a seri
 Unions in the sector say staff are working in difficult conditions and that understaffing is one of the main problems. Union leader Ana Neagu said that if their demands are not met by the end of the year, members would hold a warning strike.
 
 The opposition sharply criticised the authorities' response. Lawmaker Florin Rusu called for those responsible to resign and announced a formal question in parliament. ""It is unacceptable that in 2021 people are left on their own in situations like this,"" the lawmaker told a press conference."
-31,ro-news,ro,s11,"CLUJ-NAPOCA, 15.12.2027 – Protest de amploare la Cluj-Napoca: 7000 de fermieri au ieșit în stradă. „Nu ne oprim până nu suntem ascultați”, a spus Florin Chiriac.
+31,ro-news,ro,s11,protest,labor_social|human_rights|education|health|agriculture_food,"CLUJ-NAPOCA, 15.12.2027 – Protest de amploare la Cluj-Napoca: 7000 de fermieri au ieșit în stradă. „Nu ne oprim până nu suntem ascultați”, a spus Florin Chiriac.
 
 Ministerul de resort a transmis un comunicat în care precizează că toate instituțiile implicate colaborează și că situația este sub control. Documentul mai arată că au fost mobilizate echipe din mai multe județe și că, dacă va fi nevoie, va fi solicitat sprijin și prin mecanismele europene de cooperare.
 
@@ -998,7 +998,7 @@ Specialiștii în securitate atrag atenția că astfel de incidente devin tot ma
 Opoziția a criticat dur reacția autorităților. Deputatul Irina Zamfir a cerut demisia celor responsabili și a anunțat că va depune o interpelare în Parlament. „Este inacceptabil ca, în 2023, oamenii să fie lăsați singuri în fața unor astfel de situații”, a declarat acesta într-o conferință de presă.
 
 Potrivit datelor publicate de Consiliul Concurenței, situația din Cluj-Napoca s-a deteriorat constant în ultimii ani. Experții consultați de redacție spun că problemele nu sunt noi, dar că autoritățile locale au amânat de prea multe ori deciziile importante. „Am avertizat încă din 2022 că lucrurile vor ajunge aici”, a declarat Oana Zamfir, care a coordonat un studiu pe această temă."
-32,en-wire,en,s12,"ORADEA, 18.07.2027 – NATO defence ministers met in Brussels on Thursday to discuss air defence for Hungary. Deputy Secretary General Vlad Dragomir said allies would deliver 5 more SAMP/T systems.
+32,en-wire,en,s12,diplomatic_meeting,defense_military|international_relations,"ORADEA, 18.07.2027 – NATO defence ministers met in Brussels on Thursday to discuss air defence for Hungary. Deputy Secretary General Vlad Dragomir said allies would deliver 5 more SAMP/T systems.
 
 Researchers at the University of Oradea analysed data from the past two decades and found a clear increase in the frequency of such events. Their conclusions, published in a peer-reviewed journal, show that without major investment the risks will keep rising in the years ahead.
 
@@ -1037,7 +1037,7 @@ Representatives of Curtea de Conturi said they were following developments close
 At European level, the European Commission said it was monitoring developments in the region. A Commission spokesperson said Romania could access additional funds, but that applications had to be submitted on time and with complete documentation. The procedure usually takes several months.
 
 National statistics show that more than 880,000 people live in Bihor county, and almost 68% of them in rural areas. Specialists point out that rural infrastructure is far more vulnerable and that investment in recent years has fallen short of what is needed."
-33,ro-news,ro,s12,"GALAȚI, 09.12.2027 – Miniștrii apărării din NATO s-au reunit miercuri la Bruxelles pentru a discuta apărarea antiaeriană a Hungary. Adjunctul secretarului general, Vlad Dragomir, a anunțat 5 noi sisteme SAMP/T.
+33,ro-news,ro,s12,diplomatic_meeting,defense_military|international_relations,"GALAȚI, 09.12.2027 – Miniștrii apărării din NATO s-au reunit miercuri la Bruxelles pentru a discuta apărarea antiaeriană a Hungary. Adjunctul secretarului general, Vlad Dragomir, a anunțat 5 noi sisteme SAMP/T.
 
 Datele Institutului Național de Statistică arată că în județul Galați trăiesc peste 150.000 de persoane, iar aproape 9% dintre acestea locuiesc în mediul rural. Specialiștii atrag atenția că infrastructura din zonele rurale este mult mai vulnerabilă și că investițiile din ultimii ani au fost insuficiente.
 
@@ -1078,7 +1078,7 @@ Potrivit datelor publicate de ANPC, situația din Galați s-a deteriorat constan
 Datele Institutului Național de Statistică arată că în județul Galați trăiesc peste 610.000 de persoane, iar aproape 29% dintre acestea locuiesc în mediul rural. Specialiștii atrag atenția că infrastructura din zonele rurale este mult mai vulnerabilă și că investițiile din ultimii ani au fost insuficiente.
 
 Analiștii economici estimează că impactul asupra economiei locale ar putea depăși 47 de milioane de euro. Firmele din zonă, în special cele mici și mijlocii, au fost cel mai grav afectate, iar unele dintre ele au fost nevoite să își suspende temporar activitatea. Camera de Comerț din Galați a cerut scutiri de taxe."
-34,en-wire,en,s12,"PITEȘTI, 27.05.2027 – NATO defence ministers met in Brussels on Tuesday to discuss air defence for Hungary. Deputy Secretary General Vlad Dragomir said allies would deliver 5 more SAMP/T systems.
+34,en-wire,en,s12,diplomatic_meeting,defense_military|international_relations,"PITEȘTI, 27.05.2027 – NATO defence ministers met in Brussels on Tuesday to discuss air defence for Hungary. Deputy Secretary General Vlad Dragomir said allies would deliver 5 more SAMP/T systems.
 
 National statistics show that more than 780,000 people live in Argeș county, and almost 32% of them in rural areas. Specialists point out that rural infrastructure is far more vulnerable and that investment in recent years has fallen short of what is needed.
 
@@ -1111,7 +1111,7 @@ The prefect of Argeș county convened the emergency committee, which agreed a se
 The opposition sharply criticised the authorities' response. Lawmaker Gabriela Pârvu called for those responsible to resign and announced a formal question in parliament. ""It is unacceptable that in 2022 people are left on their own in situations like this,"" the lawmaker told a press conference.
 
 Researchers at the University of Pitești analysed data from the past two decades and found a clear increase in the frequency of such events. Their conclusions, published in a peer-reviewed journal, show that without major investment the risks will keep rising in the years ahead."
-35,ro-news,ro,s13,"PLOIEȘTI, 20.03.2027 – Victorie pentru Farul Constanța în meciul cu CFR Cluj: 1-3. Decisiv a fost Mihai Nica, care a înscris în minutul 30.
+35,ro-news,ro,s13,sports_event,sports,"PLOIEȘTI, 20.03.2027 – Victorie pentru Farul Constanța în meciul cu CFR Cluj: 1-3. Decisiv a fost Mihai Nica, care a înscris în minutul 30.
 
 Sindicatele din sector susțin că angajații lucrează în condiții dificile și că lipsa de personal este una dintre principalele probleme. Liderul sindical Irina Bălan a declarat că, dacă revendicările nu vor fi îndeplinite până la sfârșitul anului, membrii organizației vor intra în grevă de avertisment.
 
@@ -1166,7 +1166,7 @@ Prefectul județului Prahova a convocat Comitetul pentru Situații de Urgență,
 Datele Institutului Național de Statistică arată că în județul Prahova trăiesc peste 880.000 de persoane, iar aproape 27% dintre acestea locuiesc în mediul rural. Specialiștii atrag atenția că infrastructura din zonele rurale este mult mai vulnerabilă și că investițiile din ultimii ani au fost insuficiente.
 
 Organizațiile neguvernamentale din Ploiești au organizat deja colecte și au mobilizat voluntari. Președintele unei asociații locale, Mirela Pană, spune că răspunsul comunității a fost impresionant: în doar câteva zile au fost strânse peste 92 de tone de alimente și produse de igienă, distribuite familiilor afectate."
-36,en-wire,en,s13,"BUZĂU, 10.08.2027 – Farul Constanța beat CFR Cluj 1-3, with Mihai Nica scoring in the 30th minute.
+36,en-wire,en,s13,sports_event,sports,"BUZĂU, 10.08.2027 – Farul Constanța beat CFR Cluj 1-3, with Mihai Nica scoring in the 30th minute.
 
 Non-governmental organisations in Buzău have already organised collections and mobilised volunteers. Viorel Dobre, who heads a local association, said the community response had been remarkable: in just a few days more than 6 tonnes of food and hygiene products were collected and distributed to affected families.
 
@@ -1185,7 +1185,7 @@ The mayor of Buzău said the administration had already allocated 72 million lei
 Researchers at the University of Buzău analysed data from the past two decades and found a clear increase in the frequency of such events. Their conclusions, published in a peer-reviewed journal, show that without major investment the risks will keep rising in the years ahead.
 
 Representatives of Direcția de Sănătate Publică said they were following developments closely and would publish a detailed report in the coming weeks. Residents of Buzău, meanwhile, complain that official information reaches them slowly and that decisions are taken without public consultation. Several local councillors have called for an extraordinary session."
-37,en-wire,en,s13,"BUZĂU, 02.04.2027 – Farul Constanța beat CFR Cluj 1-3, with Mihai Nica scoring in the 30th minute.
+37,en-wire,en,s13,sports_event,sports,"BUZĂU, 02.04.2027 – Farul Constanța beat CFR Cluj 1-3, with Mihai Nica scoring in the 30th minute.
 
 The Buzău municipal budget for 2023 provides for investment of around 19 million lei, but a large part of it depends on attracting European funds. Local councillors are due to vote on the budget revision at next month's session.
 
@@ -1218,7 +1218,7 @@ Non-governmental organisations in Buzău have already organised collections and 
 The investigation has only just begun, and prosecutors do not rule out that others were involved. Judicial sources quoted by local media say investigators are examining documents covering the past 45 years and have already questioned several witnesses, including former employees.
 
 Unions in the sector say staff are working in difficult conditions and that understaffing is one of the main problems. Union leader Bianca Jitaru said that if their demands are not met by the end of the year, members would hold a warning strike."
-38,ro-news,ro,s14,"BRAȘOV, 06.05.2027 – Un incendiu a izbucnit marți la o hală a companiei Medlife din Brașov. 1 angajați au fost răniți, potrivit ISU, a declarat Bianca Vlad.
+38,ro-news,ro,s14,accident,accidents_emergencies,"BRAȘOV, 06.05.2027 – Un incendiu a izbucnit marți la o hală a companiei Medlife din Brașov. 1 angajați au fost răniți, potrivit ISU, a declarat Bianca Vlad.
 
 Ministerul de resort a transmis un comunicat în care precizează că toate instituțiile implicate colaborează și că situația este sub control. Documentul mai arată că au fost mobilizate echipe din mai multe județe și că, dacă va fi nevoie, va fi solicitat sprijin și prin mecanismele europene de cooperare.
 
@@ -1243,7 +1243,7 @@ Opoziția a criticat dur reacția autorităților. Deputatul Oana Dragomir a cer
 Analiștii economici estimează că impactul asupra economiei locale ar putea depăși 16 de milioane de euro. Firmele din zonă, în special cele mici și mijlocii, au fost cel mai grav afectate, iar unele dintre ele au fost nevoite să își suspende temporar activitatea. Camera de Comerț din Brașov a cerut scutiri de taxe.
 
 Potrivit datelor publicate de Curtea de Conturi, situația din Brașov s-a deteriorat constant în ultimii ani. Experții consultați de redacție spun că problemele nu sunt noi, dar că autoritățile locale au amânat de prea multe ori deciziile importante. „Am avertizat încă din 2025 că lucrurile vor ajunge aici”, a declarat Irina Nica, care a coordonat un studiu pe această temă."
-39,ro-news,ro,s14,"BRAȘOV, 20.02.2027 – Explozie urmată de incendiu la fabrica Medlife din Brașov: pompierii au intervenit cu 12 autospeciale. Directorul Bianca Vlad spune că producția este oprită.
+39,ro-news,ro,s14,accident,accidents_emergencies,"BRAȘOV, 20.02.2027 – Explozie urmată de incendiu la fabrica Medlife din Brașov: pompierii au intervenit cu 12 autospeciale. Directorul Bianca Vlad spune că producția este oprită.
 
 Primarul din Brașov a declarat că administrația a alocat deja 89 de milioane de lei pentru măsuri urgente și că va solicita sprijin de la Guvern. „Nu putem rezolva singuri o problemă de această amploare”, a spus edilul, care a adăugat că o echipă de specialiști va evalua costurile reale până la sfârșitul lunii.
 
@@ -1262,7 +1262,7 @@ Potrivit datelor publicate de Curtea de Conturi, situația din Brașov s-a deter
 Potrivit datelor publicate de Inspectoratul Școlar, situația din Brașov s-a deteriorat constant în ultimii ani. Experții consultați de redacție spun că problemele nu sunt noi, dar că autoritățile locale au amânat de prea multe ori deciziile importante. „Am avertizat încă din 2023 că lucrurile vor ajunge aici”, a declarat Costin Mocanu, care a coordonat un studiu pe această temă.
 
 Organizațiile neguvernamentale din Brașov au organizat deja colecte și au mobilizat voluntari. Președintele unei asociații locale, Sorin Ardeleanu, spune că răspunsul comunității a fost impresionant: în doar câteva zile au fost strânse peste 82 de tone de alimente și produse de igienă, distribuite familiilor afectate."
-40,ro-news,ro,s14,"BRAȘOV, 06.09.2027 – Un incendiu a izbucnit sâmbătă la o hală a companiei Medlife din Brașov. 1 angajați au fost răniți, potrivit ISU, a declarat Bianca Vlad.
+40,ro-news,ro,s14,accident,accidents_emergencies,"BRAȘOV, 06.09.2027 – Un incendiu a izbucnit sâmbătă la o hală a companiei Medlife din Brașov. 1 angajați au fost răniți, potrivit ISU, a declarat Bianca Vlad.
 
 Primarul din Brașov a declarat că administrația a alocat deja 4 de milioane de lei pentru măsuri urgente și că va solicita sprijin de la Guvern. „Nu putem rezolva singuri o problemă de această amploare”, a spus edilul, care a adăugat că o echipă de specialiști va evalua costurile reale până la sfârșitul lunii.
 
@@ -1275,7 +1275,7 @@ Sindicatele din sector susțin că angajații lucrează în condiții dificile �
 Primarul din Brașov a declarat că administrația a alocat deja 52 de milioane de lei pentru măsuri urgente și că va solicita sprijin de la Guvern. „Nu putem rezolva singuri o problemă de această amploare”, a spus edilul, care a adăugat că o echipă de specialiști va evalua costurile reale până la sfârșitul lunii.
 
 Bugetul local al municipiului Brașov pentru anul 2022 prevede investiții de aproximativ 30 de milioane de lei, însă o parte importantă a acestora depinde de atragerea fondurilor europene. Consilierii locali urmează să voteze rectificarea bugetară în ședința de luna viitoare."
-41,ro-news,ro,s15,"ORADEA, 13.01.2027 – Inundațiile din județul Bihor au afectat 307 de gospodării din Oradea. Radu Ene, purtător de cuvânt al ISU Bihor, a anunțat duminică că 187 de persoane au fost evacuate.
+41,ro-news,ro,s15,natural_disaster,natural_disasters|environment_climate,"ORADEA, 13.01.2027 – Inundațiile din județul Bihor au afectat 307 de gospodării din Oradea. Radu Ene, purtător de cuvânt al ISU Bihor, a anunțat duminică că 187 de persoane au fost evacuate.
 
 Bugetul local al municipiului Oradea pentru anul 2023 prevede investiții de aproximativ 78 de milioane de lei, însă o parte importantă a acestora depinde de atragerea fondurilor europene. Consilierii locali urmează să voteze rectificarea bugetară în ședința de luna viitoare.
 
@@ -1304,7 +1304,7 @@ Prefectul județului Bihor a convocat Comitetul pentru Situații de Urgență, c
 Bugetul local al municipiului Oradea pentru anul 2022 prevede investiții de aproximativ 22 de milioane de lei, însă o parte importantă a acestora depinde de atragerea fondurilor europene. Consilierii locali urmează să voteze rectificarea bugetară în ședința de luna viitoare.
 
 Prefectul județului Bihor a convocat Comitetul pentru Situații de Urgență, care a stabilit o serie de măsuri imediate. Printre acestea se numără verificarea tuturor clădirilor publice, suplimentarea echipajelor de intervenție și informarea constantă a populației prin mesaje RO-ALERT."
-42,uk-news,uk,s15,"ORADEA, 19.04.2027 – Повінь у румунському місті Орадя пошкодила 307 будинків, 187 людей евакуювали, повідомив Раду Ене.
+42,uk-news,uk,s15,natural_disaster,natural_disasters|environment_climate,"ORADEA, 19.04.2027 – Повінь у румунському місті Орадя пошкодила 307 будинків, 187 людей евакуювали, повідомив Раду Ене.
 
 На європейському рівні Європейська комісія стежить за розвитком подій. Речник комісії уточнив, що Румунія може отримати додаткові кошти за умови вчасного подання документів.
 
@@ -1405,7 +1405,7 @@ Prefectul județului Bihor a convocat Comitetul pentru Situații de Urgență, c
 Опозиція різко розкритикувала дії влади. Депутат Ионуц Влад вимагав відставки відповідальних осіб і оголосив про депутатський запит.
 
 Дослідники проаналізували дані за останні двадцять років і виявили чітке зростання частоти подібних подій. Без значних інвестицій ризики лише зростатимуть, попереджають вони."
-43,ro-opinion,ro,,"ARAD, 02.11.2027 – Reforma pensiilor nu poate fi amânată la nesfârșit. Fără decizii curajoase, deficitul va continua să crească, scrie economistul Valentin Lazăr.
+43,ro-opinion,ro,,,,"ARAD, 02.11.2027 – Reforma pensiilor nu poate fi amânată la nesfârșit. Fără decizii curajoase, deficitul va continua să crească, scrie economistul Valentin Lazăr.
 
 Opoziția a criticat dur reacția autorităților. Deputatul Petru Sandu a cerut demisia celor responsabili și a anunțat că va depune o interpelare în Parlament. „Este inacceptabil ca, în 2026, oamenii să fie lăsați singuri în fața unor astfel de situații”, a declarat acesta într-o conferință de presă.
 
@@ -1438,7 +1438,7 @@ La nivel european, Comisia Europeană a anunțat că monitorizează evoluțiile 
 Analiștii economici estimează că impactul asupra economiei locale ar putea depăși 3 de milioane de euro. Firmele din zonă, în special cele mici și mijlocii, au fost cel mai grav afectate, iar unele dintre ele au fost nevoite să își suspende temporar activitatea. Camera de Comerț din Arad a cerut scutiri de taxe.
 
 Specialiștii în securitate atrag atenția că astfel de incidente devin tot mai frecvente și că instituțiile publice sunt adesea slab pregătite. Un audit realizat anul trecut a arătat că aproape 57% dintre instituțiile verificate nu aveau planuri actualizate de răspuns la incidente."
-44,ro-news,ro,s16,"SATU MARE, 03.02.2027 – Explozie urmată de incendiu la fabrica Purcari din Satu Mare: pompierii au intervenit cu 12 autospeciale. Directorul Viorel Lupu spune că producția este oprită.
+44,ro-news,ro,s16,accident,accidents_emergencies,"SATU MARE, 03.02.2027 – Explozie urmată de incendiu la fabrica Purcari din Satu Mare: pompierii au intervenit cu 12 autospeciale. Directorul Viorel Lupu spune că producția este oprită.
 
 Specialiștii în securitate atrag atenția că astfel de incidente devin tot mai frecvente și că instituțiile publice sunt adesea slab pregătite. Un audit realizat anul trecut a arătat că aproape 47% dintre instituțiile verificate nu aveau planuri actualizate de răspuns la incidente.
 
@@ -1463,7 +1463,7 @@ Datele Institutului Național de Statistică arată că în județul Satu Mare t
 Potrivit datelor publicate de Consiliul Concurenței, situația din Satu Mare s-a deteriorat constant în ultimii ani. Experții consultați de redacție spun că problemele nu sunt noi, dar că autoritățile locale au amânat de prea multe ori deciziile importante. „Am avertizat încă din 2019 că lucrurile vor ajunge aici”, a declarat Eugen Vasilescu, care a coordonat un studiu pe această temă.
 
 La nivel european, Comisia Europeană a anunțat că monitorizează evoluțiile din regiune. Un purtător de cuvânt al instituției a spus că România poate accesa fonduri suplimentare, dar că cererile trebuie depuse în termenele stabilite și însoțite de documentația completă. Procedura durează, de regulă, câteva luni."
-45,ro-news,ro,s17,"BOTOȘANI, 18.08.2027 – Percheziții la Botoșani într-un dosar de trafic de droguri: 8 suspecți au fost duși la audieri. Purtătorul de cuvânt Emil Chiriac vorbește de un prejudiciu de 16 milioane de lei.
+45,ro-news,ro,s17,crime_incident,crime_justice,"BOTOȘANI, 18.08.2027 – Percheziții la Botoșani într-un dosar de trafic de droguri: 8 suspecți au fost duși la audieri. Purtătorul de cuvânt Emil Chiriac vorbește de un prejudiciu de 16 milioane de lei.
 
 Specialiștii în securitate atrag atenția că astfel de incidente devin tot mai frecvente și că instituțiile publice sunt adesea slab pregătite. Un audit realizat anul trecut a arătat că aproape 19% dintre instituțiile verificate nu aveau planuri actualizate de răspuns la incidente.
 
@@ -1504,7 +1504,7 @@ Specialiștii în securitate atrag atenția că astfel de incidente devin tot ma
 Reacțiile pe rețelele sociale au fost numeroase. Mii de utilizatori au distribuit imagini și mesaje de solidaritate, însă au circulat și informații false, pe care autoritățile au fost nevoite să le dezmintă. Experții în comunicare recomandă ca oamenii să se informeze doar din surse oficiale.
 
 Reprezentanții Agenția Națională de Administrare Fiscală au transmis că urmăresc evoluția situației și că vor publica un raport detaliat în următoarele săptămâni. Între timp, locuitorii din Botoșani se plâng că informațiile oficiale ajung greu la ei și că deciziile sunt luate fără consultare publică. Mai mulți consilieri locali au cerut o ședință extraordinară."
-46,ro-news,ro,s17,"BOTOȘANI, 24.12.2027 – Procurorii DIICOT au reținut duminică 8 persoane suspectate de trafic de droguri în județul Botoșani. Prejudiciul este estimat la 16 milioane de lei, a precizat Emil Chiriac.
+46,ro-news,ro,s17,crime_incident,crime_justice,"BOTOȘANI, 24.12.2027 – Procurorii DIICOT au reținut duminică 8 persoane suspectate de trafic de droguri în județul Botoșani. Prejudiciul este estimat la 16 milioane de lei, a precizat Emil Chiriac.
 
 La nivel european, Comisia Europeană a anunțat că monitorizează evoluțiile din regiune. Un purtător de cuvânt al instituției a spus că România poate accesa fonduri suplimentare, dar că cererile trebuie depuse în termenele stabilite și însoțite de documentația completă. Procedura durează, de regulă, câteva luni.
 
@@ -1519,7 +1519,7 @@ Ancheta este abia la început, iar procurorii nu exclud ca și alte persoane să
 Potrivit datelor publicate de ANPC, situația din Botoșani s-a deteriorat constant în ultimii ani. Experții consultați de redacție spun că problemele nu sunt noi, dar că autoritățile locale au amânat de prea multe ori deciziile importante. „Am avertizat încă din 2024 că lucrurile vor ajunge aici”, a declarat Teodora Nistor, care a coordonat un studiu pe această temă.
 
 Ministerul de resort a transmis un comunicat în care precizează că toate instituțiile implicate colaborează și că situația este sub control. Documentul mai arată că au fost mobilizate echipe din mai multe județe și că, dacă va fi nevoie, va fi solicitat sprijin și prin mecanismele europene de cooperare."
-47,ro-news,ro,s18,"TIMIȘOARA, 17.10.2027 – Teraplast raportează profit de 330 milioane de lei, în creștere cu 40%. „Investițiile încep să dea roade”, a spus directorul general Raluca Tănase.
+47,ro-news,ro,s18,economic_event,business|finance_markets|economy,"TIMIȘOARA, 17.10.2027 – Teraplast raportează profit de 330 milioane de lei, în creștere cu 40%. „Investițiile încep să dea roade”, a spus directorul general Raluca Tănase.
 
 Opoziția a criticat dur reacția autorităților. Deputatul Delia Florea a cerut demisia celor responsabili și a anunțat că va depune o interpelare în Parlament. „Este inacceptabil ca, în 2019, oamenii să fie lăsați singuri în fața unor astfel de situații”, a declarat acesta într-o conferință de presă.
 
@@ -1544,7 +1544,7 @@ Opoziția a criticat dur reacția autorităților. Deputatul Sebastian Pârvu a 
 Opoziția a criticat dur reacția autorităților. Deputatul Dan Husar a cerut demisia celor responsabili și a anunțat că va depune o interpelare în Parlament. „Este inacceptabil ca, în 2019, oamenii să fie lăsați singuri în fața unor astfel de situații”, a declarat acesta într-o conferință de presă.
 
 Ancheta este abia la început, iar procurorii nu exclud ca și alte persoane să fie implicate. Surse judiciare citate de presa locală spun că anchetatorii analizează documente din ultimii 64 ani și că au fost audiați deja mai mulți martori, printre care și foști angajați ai instituțiilor implicate."
-48,ro-news,ro,s19,"CLUJ-NAPOCA, 26.04.2027 – Un incendiu a izbucnit luni la o hală a companiei Sphera din Cluj-Napoca. 5 angajați au fost răniți, potrivit ISU, a declarat Nicolae Ilie.
+48,ro-news,ro,s19,accident,accidents_emergencies,"CLUJ-NAPOCA, 26.04.2027 – Un incendiu a izbucnit luni la o hală a companiei Sphera din Cluj-Napoca. 5 angajați au fost răniți, potrivit ISU, a declarat Nicolae Ilie.
 
 Specialiștii în securitate atrag atenția că astfel de incidente devin tot mai frecvente și că instituțiile publice sunt adesea slab pregătite. Un audit realizat anul trecut a arătat că aproape 64% dintre instituțiile verificate nu aveau planuri actualizate de răspuns la incidente.
 
@@ -1571,7 +1571,7 @@ Primarul din Cluj-Napoca a declarat că administrația a alocat deja 55 de milio
 Opoziția a criticat dur reacția autorităților. Deputatul Mihai Mazilu a cerut demisia celor responsabili și a anunțat că va depune o interpelare în Parlament. „Este inacceptabil ca, în 2025, oamenii să fie lăsați singuri în fața unor astfel de situații”, a declarat acesta într-o conferință de presă.
 
 La nivel european, Comisia Europeană a anunțat că monitorizează evoluțiile din regiune. Un purtător de cuvânt al instituției a spus că România poate accesa fonduri suplimentare, dar că cererile trebuie depuse în termenele stabilite și însoțite de documentația completă. Procedura durează, de regulă, câteva luni."
-49,ro-news,ro,s19,"CLUJ-NAPOCA, 02.06.2027 – Explozie urmată de incendiu la fabrica Sphera din Cluj-Napoca: pompierii au intervenit cu 12 autospeciale. Directorul Nicolae Ilie spune că producția este oprită.
+49,ro-news,ro,s19,accident,accidents_emergencies,"CLUJ-NAPOCA, 02.06.2027 – Explozie urmată de incendiu la fabrica Sphera din Cluj-Napoca: pompierii au intervenit cu 12 autospeciale. Directorul Nicolae Ilie spune că producția este oprită.
 
 Opoziția a criticat dur reacția autorităților. Deputatul Ionuț Enache a cerut demisia celor responsabili și a anunțat că va depune o interpelare în Parlament. „Este inacceptabil ca, în 2024, oamenii să fie lăsați singuri în fața unor astfel de situații”, a declarat acesta într-o conferință de presă.
 
@@ -1634,7 +1634,7 @@ Reacțiile pe rețelele sociale au fost numeroase. Mii de utilizatori au distrib
 Analiștii economici estimează că impactul asupra economiei locale ar putea depăși 84 de milioane de euro. Firmele din zonă, în special cele mici și mijlocii, au fost cel mai grav afectate, iar unele dintre ele au fost nevoite să își suspende temporar activitatea. Camera de Comerț din Cluj-Napoca a cerut scutiri de taxe.
 
 La nivel european, Comisia Europeană a anunțat că monitorizează evoluțiile din regiune. Un purtător de cuvânt al instituției a spus că România poate accesa fonduri suplimentare, dar că cererile trebuie depuse în termenele stabilite și însoțite de documentația completă. Procedura durează, de regulă, câteva luni."
-50,ro-news,ro,s19,"CLUJ-NAPOCA, 13.01.2027 – Explozie urmată de incendiu la fabrica Sphera din Cluj-Napoca: pompierii au intervenit cu 12 autospeciale. Directorul Nicolae Ilie spune că producția este oprită.
+50,ro-news,ro,s19,accident,accidents_emergencies,"CLUJ-NAPOCA, 13.01.2027 – Explozie urmată de incendiu la fabrica Sphera din Cluj-Napoca: pompierii au intervenit cu 12 autospeciale. Directorul Nicolae Ilie spune că producția este oprită.
 
 Ministerul de resort a transmis un comunicat în care precizează că toate instituțiile implicate colaborează și că situația este sub control. Documentul mai arată că au fost mobilizate echipe din mai multe județe și că, dacă va fi nevoie, va fi solicitat sprijin și prin mecanismele europene de cooperare.
 

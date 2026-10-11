@@ -1,6 +1,10 @@
 # Risk level (Laya). Labels are ORDERED from lowest to highest: risk_score is the expected
 # level on [0, 1], so rows can be sorted by risk.
 enabled: true
+# Measured (docs/BENCHMARKS.md): the lead (1,024 tokens) is ~2x faster than 2,048 with equal
+# or better accuracy on gold-labelled articles (inverted-pyramid news: the point comes first).
+max_chars: 3500
+engine_options: {max_len: 1024}
 engine: laya            # risk -> Laya
 instructions: >-
   How much risk to people, infrastructure, institutions or public order does the document

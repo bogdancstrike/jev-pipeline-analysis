@@ -26,6 +26,7 @@ export const api = {
   metrics: (id: string, signal?: AbortSignal) => request<JobMetrics>(`/jobs/${id}/metrics`, { signal }),
   engineMetrics: (signal?: AbortSignal) => request<Record<string, EngineMetrics>>("/engines/metrics", { signal }),
   runs: (signal?: AbortSignal) => request<RunRecord[]>("/runs", { signal, params: { limit: 200 } }),
+  deleteRuns: (ids: string[]) => request<void>("/runs/delete", { method: "POST", ...json({ ids }) }),
 
   /** Start a job on a sample the server already has: nothing is uploaded. */
   sampleJob: (sample: string, modules: string[]) =>

@@ -1,5 +1,9 @@
 # Toxicity (LLM). Adds toxicity_score = 1 - P(non_toxic).
 enabled: true
+# Measured (docs/BENCHMARKS.md): the lead (1,024 tokens) is ~2x faster than 2,048 with equal
+# or better accuracy on gold-labelled articles (inverted-pyramid news: the point comes first).
+max_chars: 3500
+engine_options: {max_len: 1024}
 engine: laya            # toxicity categories -> Laya
 instructions: >-
   Which kind of abusive language, if any, does the document contain?
